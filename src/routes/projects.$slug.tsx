@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, CheckCircle2, MapPin, Calendar, Briefcase, MessageCircle } from "lucide-react";
+import type { Project } from "@/lib/site";
 import { brand, projects, waLink } from "@/lib/site";
 
 export const Route = createFileRoute("/projects/$slug")({
@@ -26,7 +27,7 @@ export const Route = createFileRoute("/projects/$slug")({
 });
 
 function ProjectDetail() {
-  const { project: p } = Route.useLoaderData();
+  const { project: p } = Route.useLoaderData() as { project: Project };
 
   return (
     <>
