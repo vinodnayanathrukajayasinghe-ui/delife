@@ -79,12 +79,12 @@ function AdminLayout() {
     );
   }
 
-  const nav = [
+  const nav: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
     { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
     { to: "/admin/projects", label: "Projects", icon: Briefcase },
     { to: "/admin/leads", label: "Leads", icon: Mail },
     { to: "/admin/settings", label: "Site Settings", icon: Settings },
-  ] as const;
+  ];
 
   return (
     <div className="min-h-screen bg-[color:var(--section)]">
