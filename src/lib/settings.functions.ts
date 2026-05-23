@@ -6,7 +6,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 export const getPublicSettings = createServerFn({ method: "GET" }).handler(async () => {
   const { data } = await supabaseAdmin
     .from("site_settings")
-    .select("phone,whatsapp,email,address,facebook_url,instagram_url,linkedin_url,hero_headline,hero_subheadline")
+    .select("phone,whatsapp,email,address,facebook_url,instagram_url,linkedin_url,hero_headline,hero_subheadline,hero_image_url,hero_cta_label,hero_cta_href")
     .limit(1)
     .maybeSingle();
   return data;
