@@ -51,10 +51,9 @@ export function Header() {
             : "border-transparent bg-background"
         }`}
       >
-        <div className="container-px mx-auto flex max-w-7xl items-center justify-between gap-6 py-3">
+        <div className="container-px mx-auto flex max-w-7xl items-center justify-between gap-6 py-2">
           <Link to="/" className="flex items-center gap-3" aria-label={brand.name}>
-            <img src={brand.logoIcon} alt="" className="h-11 w-11 object-contain md:hidden" />
-            <img src={brand.logoFull} alt={brand.name} className="hidden h-14 w-auto object-contain md:block" />
+            <img src={brand.logoFull} alt={brand.name} className="h-16 w-auto object-contain md:h-14" />
             <span className="sr-only">{brand.name}</span>
           </Link>
 
