@@ -1,0 +1,254 @@
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { ArrowLeft, Upload, Trash2, Save } from "lucide-react";
+import {
+  adminAddProjectImage,
+  adminCreateUploadUrl,
+  adminDeleteProjectImage,
+  adminGetProject,
+  adminSaveProject,
+} from "@/lib/projects.functions";
+import { supabase } from "@/integrations/supabase/client";
+
+export const Route = createFileRoute("/admin/projects/$id")({
+  component: ProjectEditor,
+});
+
+function ProjectEditor() {
+  const { id } = Route.useParams();
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+
+  const getFn = useServerFn(adminGetProject);
+  const saveFn = useServerFn(adminSaveProject);
+  const addImg = useServerFn(adminAddProjectImage);
+  const delImg = useServerFn(adminDeleteProjectImage);
+  const uploadUrl = useServerFn(adminCreateUploadUrl);
+
+  const q = useQuery({ queryKey: ["admin", "project", id], queryFn: () => getFn({ data: { id } }) });
+
+  const [form, setForm] = useState<any>(null);
+  useEffect(() => {
+    if (q.data?.project && !form) setForm(q.data.project);
+  }, [q.data, form]);
+
+  const save = useMutation({
+    mutationFn: async () => saveFn({ data: { ...form, year: form.year ? Number(form.year) : null } }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin", "project", id] });
+      qc.invalidateQueries({ queryKey: ["admin", "projects"] });
+    },
+  });
+
+  const removeImage = useMutation({
+    mutationFn: async (imgId: string) => delImg({ data: { id: imgId } }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "project", id] }),
+  });
+
+  async function uploadFile(file: File, kind: "cover" | "gallery" | "before" | "after", pairId?: string) {
+    const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const u = await uploadUrl({ data: { filename: safe } });
+    const up = await supabase.storage.from("project-media").uploadToSignedUrl(u.path, u.token, file, { contentType: file.type });
+    if (up.error) throw up.error;
+    if (kind === "cover") {
+      setForm((f: any) => ({ ...f, cover_image_url: u.publicUrl }));
+    } else {
+      await addImg({ data: { project_id: id, url: u.publicUrl, kind, pair_id: pairId } });
+      qc.invalidateQueries({ queryKey: ["admin", "project", id] });
+    }
+  }
+
+  if (q.isLoading || !form) {
+    return <div className="text-sm text-muted-foreground">Loading editor…</div>;
+  }
+
+  const gallery = (q.data?.images ?? []).filter((i) => i.kind === "gallery");
+  const beforeImgs = (q.data?.images ?? []).filter((i) => i.kind === "before");
+  const afterImgs = (q.data?.images ?? []).filter((i) => i.kind === "after");
+
+  return (
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
+        <Link to="/admin/projects" className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
+          <ArrowLeft className="h-4 w-4" /> Back to projects
+        </Link>
+        <button
+          onClick={() => save.mutate()}
+          disabled={save.isPending}
+          className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-card hover:opacity-95 disabled:opacity-60"
+        >
+          <Save className="h-4 w-4" /> {save.isPending ? "Saving…" : "Save changes"}
+        </button>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="space-y-4 lg:col-span-2">
+          <Field label="Title">
+            <input value={form.title ?? ""} onChange={(e) => setForm({ ...form, title: e.target.value })} className="input" />
+          </Field>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Slug (URL)">
+              <input value={form.slug ?? ""} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="auto from title" className="input" />
+            </Field>
+            <Field label="Category">
+              <input value={form.category ?? ""} onChange={(e) => setForm({ ...form, category: e.target.value })} className="input" />
+            </Field>
+            <Field label="Location">
+              <input value={form.location ?? ""} onChange={(e) => setForm({ ...form, location: e.target.value })} className="input" />
+            </Field>
+            <Field label="Client">
+              <input value={form.client ?? ""} onChange={(e) => setForm({ ...form, client: e.target.value })} className="input" />
+            </Field>
+          </div>
+          <Field label="Short summary">
+            <input value={form.summary ?? ""} onChange={(e) => setForm({ ...form, summary: e.target.value })} className="input" />
+          </Field>
+          <Field label="Full description">
+            <textarea rows={6} value={form.description ?? ""} onChange={(e) => setForm({ ...form, description: e.target.value })} className="input" />
+          </Field>
+        </div>
+
+        <div className="space-y-4">
+          <Field label="Status">
+            <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="input">
+              <option value="completed">Completed</option>
+              <option value="ongoing">Ongoing</option>
+              <option value="upcoming">Upcoming</option>
+            </select>
+          </Field>
+          <Field label="Completion date">
+            <input type="date" value={form.completion_date ?? ""} onChange={(e) => setForm({ ...form, completion_date: e.target.value })} className="input" />
+          </Field>
+          <Field label="Year">
+            <input type="number" value={form.year ?? ""} onChange={(e) => setForm({ ...form, year: e.target.value })} className="input" />
+          </Field>
+          <Field label="Display order">
+            <input type="number" value={form.display_order ?? 0} onChange={(e) => setForm({ ...form, display_order: Number(e.target.value) })} className="input" />
+          </Field>
+          <div className="flex items-center gap-4">
+            <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox" checked={!!form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} /> Published</label>
+            <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox" checked={!!form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} /> Featured</label>
+          </div>
+
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Cover image</div>
+            {form.cover_image_url ? (
+              <img src={form.cover_image_url} alt="cover" className="mt-2 aspect-[4/3] w-full rounded-lg object-cover" />
+            ) : (
+              <div className="mt-2 grid aspect-[4/3] w-full place-items-center rounded-lg border border-dashed border-border text-xs text-muted-foreground">No cover yet</div>
+            )}
+            <FileButton label="Upload cover" onFile={(f) => uploadFile(f, "cover")} />
+          </div>
+        </div>
+      </div>
+
+      <ImageSection title="Gallery" images={gallery} onUpload={(f) => uploadFile(f, "gallery")} onDelete={(i) => removeImage.mutate(i)} />
+      <BeforeAfterSection
+        before={beforeImgs}
+        after={afterImgs}
+        onUpload={(f, kind, pairId) => uploadFile(f, kind, pairId)}
+        onDelete={(i) => removeImage.mutate(i)}
+      />
+
+      <style>{`.input{ width:100%; border:1px solid var(--input); background:var(--background); border-radius:.5rem; padding:.65rem .75rem; font-size:.875rem; outline:none; } .input:focus{ border-color: var(--primary); }`}</style>
+    </div>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="block">
+      <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</div>
+      {children}
+    </label>
+  );
+}
+
+function FileButton({ label, onFile }: { label: string; onFile: (f: File) => void | Promise<void> }) {
+  const [busy, setBusy] = useState(false);
+  return (
+    <label className={`mt-2 inline-flex cursor-pointer items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold hover:border-primary hover:text-primary ${busy ? "opacity-60" : ""}`}>
+      <Upload className="h-3 w-3" /> {busy ? "Uploading…" : label}
+      <input
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={async (e) => {
+          const f = e.target.files?.[0];
+          if (!f) return;
+          setBusy(true);
+          try { await onFile(f); } catch (err: any) { alert(err?.message ?? "Upload failed"); } finally { setBusy(false); e.target.value = ""; }
+        }}
+      />
+    </label>
+  );
+}
+
+function ImageSection({ title, images, onUpload, onDelete }: { title: string; images: any[]; onUpload: (f: File) => Promise<void>; onDelete: (id: string) => void; }) {
+  return (
+    <div className="rounded-xl border border-border bg-card p-5 shadow-card">
+      <div className="flex items-center justify-between">
+        <h2 className="font-display text-lg">{title}</h2>
+        <FileButton label="Add image" onFile={onUpload} />
+      </div>
+      {images.length === 0 ? (
+        <p className="mt-3 text-xs text-muted-foreground">No images yet.</p>
+      ) : (
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          {images.map((img) => (
+            <div key={img.id} className="group relative overflow-hidden rounded-lg border border-border">
+              <img src={img.url} alt="" className="aspect-square w-full object-cover" />
+              <button onClick={() => onDelete(img.id)} className="absolute right-1.5 top-1.5 grid h-7 w-7 place-items-center rounded-full bg-background/90 text-destructive opacity-0 transition group-hover:opacity-100">
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BeforeAfterSection({ before, after, onUpload, onDelete }: { before: any[]; after: any[]; onUpload: (f: File, kind: "before" | "after", pairId?: string) => Promise<void>; onDelete: (id: string) => void; }) {
+  // Group by pair_id; orphans displayed under "Unpaired"
+  return (
+    <div className="rounded-xl border border-border bg-card p-5 shadow-card">
+      <div className="flex items-center justify-between">
+        <h2 className="font-display text-lg">Before / After</h2>
+        <div className="flex gap-2">
+          <FileButton label="Add Before" onFile={(f) => onUpload(f, "before", crypto.randomUUID())} />
+          <FileButton label="Add After" onFile={(f) => onUpload(f, "after", crypto.randomUUID())} />
+        </div>
+      </div>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <Column title="Before" images={before} onDelete={onDelete} />
+        <Column title="After" images={after} onDelete={onDelete} />
+      </div>
+      <p className="mt-3 text-xs text-muted-foreground">Tip: to pair a before and after, upload one of each — they'll appear side by side here.</p>
+    </div>
+  );
+}
+
+function Column({ title, images, onDelete }: { title: string; images: any[]; onDelete: (id: string) => void }) {
+  return (
+    <div>
+      <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{title}</div>
+      {images.length === 0 ? (
+        <p className="text-xs text-muted-foreground">None</p>
+      ) : (
+        <div className="grid grid-cols-2 gap-2">
+          {images.map((img) => (
+            <div key={img.id} className="group relative overflow-hidden rounded-lg border border-border">
+              <img src={img.url} alt="" className="aspect-square w-full object-cover" />
+              <button onClick={() => onDelete(img.id)} className="absolute right-1.5 top-1.5 grid h-7 w-7 place-items-center rounded-full bg-background/90 text-destructive opacity-0 transition group-hover:opacity-100">
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
