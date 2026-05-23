@@ -68,7 +68,7 @@ export function Footer() {
           <p>© {new Date().getFullYear()} {brand.name}. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <span>{contact.hours}</span>
-            <Link to="/admin-login" className="text-muted-foreground/60 hover:text-primary">·</Link>
+            <Link to="/admin-login" className="font-medium text-muted-foreground hover:text-primary">Admin Login</Link>
           </div>
         </div>
       </div>
