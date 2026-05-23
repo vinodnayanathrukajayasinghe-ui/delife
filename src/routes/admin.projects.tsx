@@ -48,7 +48,10 @@ function AdminProjects() {
       const { error } = await supabase.from("projects").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "projects"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin", "projects"] });
+      qc.invalidateQueries({ queryKey: ["public-projects"] });
+    },
   });
 
   if (pathname !== "/admin/projects") {
