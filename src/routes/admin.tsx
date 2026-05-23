@@ -79,6 +79,7 @@ function AdminLayout() {
   const nav: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
     { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
     { to: "/admin/projects", label: "Projects", icon: Briefcase },
+    { to: "/admin/pages", label: "Pages", icon: FileText },
     { to: "/admin/leads", label: "Leads", icon: Mail },
     { to: "/admin/settings", label: "Site Settings", icon: Settings },
   ];
