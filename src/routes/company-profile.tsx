@@ -11,7 +11,7 @@ const selectedProjectsQuery = queryOptions({
 });
 
 export const Route = createFileRoute("/company-profile")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(selectedProjectsQuery),
+  loader: ({ context }) => context.queryClient.fetchQuery(selectedProjectsQuery),
   head: () => ({
     meta: [
       { title: `Company Profile | ${brand.name}` },

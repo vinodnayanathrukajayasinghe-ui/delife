@@ -51,6 +51,7 @@ function AdminProjects() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin", "projects"] });
       qc.invalidateQueries({ queryKey: ["public-projects"] });
+      qc.invalidateQueries({ queryKey: ["public-project"] });
     },
   });
 

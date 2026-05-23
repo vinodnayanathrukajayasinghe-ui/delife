@@ -16,7 +16,7 @@ const featuredProjectsQuery = queryOptions({
 });
 
 export const Route = createFileRoute("/")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(featuredProjectsQuery),
+  loader: ({ context }) => context.queryClient.fetchQuery(featuredProjectsQuery),
   head: () => ({
     meta: [
       { title: `${brand.name} | Elegant Interior Designing & Contracting` },

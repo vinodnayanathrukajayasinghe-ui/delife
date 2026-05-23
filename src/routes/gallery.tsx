@@ -19,7 +19,7 @@ const galleryQuery = queryOptions({
 });
 
 export const Route = createFileRoute("/gallery")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(galleryQuery),
+  loader: ({ context }) => context.queryClient.fetchQuery(galleryQuery),
   head: () => ({
     meta: [
       { title: `Gallery | ${brand.name}` },

@@ -11,7 +11,7 @@ const pageQuery = (slug: string) =>
 
 export const Route = createFileRoute("/p/$slug")({
   loader: async ({ context, params }) => {
-    const page = await context.queryClient.ensureQueryData(pageQuery(params.slug));
+    const page = await context.queryClient.fetchQuery(pageQuery(params.slug));
     if (!page) throw notFound();
     return page;
   },

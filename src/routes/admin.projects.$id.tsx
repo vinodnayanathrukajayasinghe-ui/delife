@@ -43,6 +43,8 @@ function ProjectEditor() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin", "project", id] });
       qc.invalidateQueries({ queryKey: ["admin", "projects"] });
+      qc.invalidateQueries({ queryKey: ["public-projects"] });
+      qc.invalidateQueries({ queryKey: ["public-project"] });
     },
   });
 
@@ -51,7 +53,10 @@ function ProjectEditor() {
       const { error } = await supabase.from("project_images").delete().eq("id", imgId);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "project", id] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin", "project", id] });
+      qc.invalidateQueries({ queryKey: ["public-project"] });
+    },
   });
 
   async function uploadFile(file: File, kind: "cover" | "gallery" | "before" | "after", pairId?: string) {
@@ -66,6 +71,7 @@ function ProjectEditor() {
       const { error } = await supabase.from("project_images").insert({ project_id: id, url: pub.publicUrl, kind, pair_id: pairId });
       if (error) throw error;
       qc.invalidateQueries({ queryKey: ["admin", "project", id] });
+      qc.invalidateQueries({ queryKey: ["public-project"] });
     }
   }
 
@@ -74,6 +80,7 @@ function ProjectEditor() {
       await uploadFile(file, kind, kind === "gallery" ? undefined : crypto.randomUUID());
     }
     qc.invalidateQueries({ queryKey: ["admin", "project", id] });
+    qc.invalidateQueries({ queryKey: ["public-project"] });
   }
 
   if (q.isLoading || !form) {

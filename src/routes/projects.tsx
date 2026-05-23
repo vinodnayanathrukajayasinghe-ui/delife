@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
@@ -19,7 +19,7 @@ const projectsQuery = queryOptions({
 });
 
 export const Route = createFileRoute("/projects")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(projectsQuery),
+  loader: ({ context }) => context.queryClient.fetchQuery(projectsQuery),
   head: () => ({
     meta: [
       { title: `Projects | ${brand.name}` },
@@ -33,10 +33,15 @@ export const Route = createFileRoute("/projects")({
 });
 
 function ProjectsPage() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { data: projects } = useSuspenseQuery(projectsQuery);
   const [cat, setCat] = useState("All");
   const categories = projectCategories(projects);
   const filtered = cat === "All" ? projects : projects.filter((p) => p.category === cat);
+
+  if (pathname !== "/projects") {
+    return <Outlet />;
+  }
 
   return (
     <>

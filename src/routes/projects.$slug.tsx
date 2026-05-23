@@ -20,7 +20,7 @@ const projectQuery = (slug: string) =>
 
 export const Route = createFileRoute("/projects/$slug")({
   loader: async ({ context, params }) => {
-    const data = await context.queryClient.ensureQueryData(projectQuery(params.slug));
+    const data = await context.queryClient.fetchQuery(projectQuery(params.slug));
     if (!data?.project) throw notFound();
     return data;
   },
