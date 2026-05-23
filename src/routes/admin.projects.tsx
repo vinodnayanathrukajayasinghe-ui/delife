@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,6 +9,8 @@ export const Route = createFileRoute("/admin/projects")({
 
 function AdminProjects() {
   const qc = useQueryClient();
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const q = useQuery({
     queryKey: ["admin", "projects"],
     queryFn: async () => {
@@ -24,17 +26,21 @@ function AdminProjects() {
 
   const create = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("projects").insert({
+      const { data, error } = await supabase.from("projects").insert({
         title: "Untitled project",
         slug: `untitled-project-${Date.now()}`,
         status: "completed",
         featured: false,
         published: false,
         display_order: 0,
-      });
+      }).select("id").single();
       if (error) throw error;
+      return data.id;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "projects"] }),
+    onSuccess: (id) => {
+      qc.invalidateQueries({ queryKey: ["admin", "projects"] });
+      navigate({ to: "/admin/projects/$id", params: { id } });
+    },
   });
 
   const remove = useMutation({
@@ -44,6 +50,10 @@ function AdminProjects() {
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "projects"] }),
   });
+
+  if (pathname !== "/admin/projects") {
+    return <Outlet />;
+  }
 
   return (
     <div>
