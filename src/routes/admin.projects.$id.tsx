@@ -1,15 +1,7 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, Upload, Trash2, Save } from "lucide-react";
-import {
-  adminAddProjectImage,
-  adminCreateUploadUrl,
-  adminDeleteProjectImage,
-  adminGetProject,
-  adminSaveProject,
-} from "@/lib/projects.functions";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/admin/projects/$id")({
@@ -18,16 +10,20 @@ export const Route = createFileRoute("/admin/projects/$id")({
 
 function ProjectEditor() {
   const { id } = Route.useParams();
-  const navigate = useNavigate();
   const qc = useQueryClient();
 
-  const getFn = useServerFn(adminGetProject);
-  const saveFn = useServerFn(adminSaveProject);
-  const addImg = useServerFn(adminAddProjectImage);
-  const delImg = useServerFn(adminDeleteProjectImage);
-  const uploadUrl = useServerFn(adminCreateUploadUrl);
-
-  const q = useQuery({ queryKey: ["admin", "project", id], queryFn: () => getFn({ data: { id } }) });
+  const q = useQuery({
+    queryKey: ["admin", "project", id],
+    queryFn: async () => {
+      const [{ data: project, error: e1 }, { data: images, error: e2 }] = await Promise.all([
+        supabase.from("projects").select("*").eq("id", id).maybeSingle(),
+        supabase.from("project_images").select("*").eq("project_id", id).order("display_order"),
+      ]);
+      if (e1) throw e1;
+      if (e2) throw e2;
+      return { project, images: images ?? [] };
+    },
+  });
 
   const [form, setForm] = useState<any>(null);
   useEffect(() => {
@@ -35,7 +31,15 @@ function ProjectEditor() {
   }, [q.data, form]);
 
   const save = useMutation({
-    mutationFn: async () => saveFn({ data: { ...form, year: form.year ? Number(form.year) : null } }),
+    mutationFn: async () => {
+      const payload = {
+        ...form,
+        completion_date: form.completion_date || null,
+        year: form.year ? Number(form.year) : null,
+      };
+      const { error } = await supabase.from("projects").update(payload).eq("id", id);
+      if (error) throw error;
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin", "project", id] });
       qc.invalidateQueries({ queryKey: ["admin", "projects"] });
@@ -43,19 +47,24 @@ function ProjectEditor() {
   });
 
   const removeImage = useMutation({
-    mutationFn: async (imgId: string) => delImg({ data: { id: imgId } }),
+    mutationFn: async (imgId: string) => {
+      const { error } = await supabase.from("project_images").delete().eq("id", imgId);
+      if (error) throw error;
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "project", id] }),
   });
 
   async function uploadFile(file: File, kind: "cover" | "gallery" | "before" | "after", pairId?: string) {
     const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-    const u = await uploadUrl({ data: { filename: safe } });
-    const up = await supabase.storage.from("project-media").uploadToSignedUrl(u.path, u.token, file, { contentType: file.type });
+    const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safe}`;
+    const up = await supabase.storage.from("project-media").upload(path, file, { contentType: file.type });
     if (up.error) throw up.error;
+    const { data: pub } = supabase.storage.from("project-media").getPublicUrl(path);
     if (kind === "cover") {
-      setForm((f: any) => ({ ...f, cover_image_url: u.publicUrl }));
+      setForm((f: any) => ({ ...f, cover_image_url: pub.publicUrl }));
     } else {
-      await addImg({ data: { project_id: id, url: u.publicUrl, kind, pair_id: pairId } });
+      const { error } = await supabase.from("project_images").insert({ project_id: id, url: pub.publicUrl, kind, pair_id: pairId });
+      if (error) throw error;
       qc.invalidateQueries({ queryKey: ["admin", "project", id] });
     }
   }

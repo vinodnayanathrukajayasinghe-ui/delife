@@ -1,8 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { Plus, Pencil, Trash2 } from "lucide-react";
-import { adminDeleteProject, adminListProjects, adminSaveProject } from "@/lib/projects.functions";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/admin/projects")({
   component: AdminProjects,
@@ -10,17 +9,39 @@ export const Route = createFileRoute("/admin/projects")({
 
 function AdminProjects() {
   const qc = useQueryClient();
-  const list = useServerFn(adminListProjects);
-  const save = useServerFn(adminSaveProject);
-  const del = useServerFn(adminDeleteProject);
-  const q = useQuery({ queryKey: ["admin", "projects"], queryFn: () => list() });
+  const q = useQuery({
+    queryKey: ["admin", "projects"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("projects")
+        .select("*")
+        .order("display_order")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
 
   const create = useMutation({
-    mutationFn: async () => save({ data: { title: "Untitled project", status: "completed", featured: false, published: false, display_order: 0 } }),
+    mutationFn: async () => {
+      const { error } = await supabase.from("projects").insert({
+        title: "Untitled project",
+        slug: `untitled-project-${Date.now()}`,
+        status: "completed",
+        featured: false,
+        published: false,
+        display_order: 0,
+      });
+      if (error) throw error;
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "projects"] }),
   });
+
   const remove = useMutation({
-    mutationFn: async (id: string) => del({ data: { id } }),
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("projects").delete().eq("id", id);
+      if (error) throw error;
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "projects"] }),
   });
 
@@ -52,15 +73,16 @@ function AdminProjects() {
             </tr>
           </thead>
           <tbody>
-            {q.isLoading && (<tr><td colSpan={5} className="p-6 text-center text-muted-foreground">Loading…</td></tr>)}
-            {q.data?.length === 0 && (<tr><td colSpan={5} className="p-6 text-center text-muted-foreground">No projects yet. Click “New project”.</td></tr>)}
+            {q.isLoading && (<tr><td colSpan={5} className="p-6 text-center text-muted-foreground">Loading...</td></tr>)}
+            {q.isError && (<tr><td colSpan={5} className="p-6 text-center text-destructive">{q.error.message}</td></tr>)}
+            {q.data?.length === 0 && (<tr><td colSpan={5} className="p-6 text-center text-muted-foreground">No projects yet. Click "New project".</td></tr>)}
             {q.data?.map((p) => (
               <tr key={p.id} className="border-t border-border">
                 <td className="p-3">
                   <div className="font-semibold">{p.title}</div>
                   <div className="text-xs text-muted-foreground">/{p.slug}</div>
                 </td>
-                <td className="p-3">{p.category ?? "—"}</td>
+                <td className="p-3">{p.category ?? "-"}</td>
                 <td className="p-3 capitalize">{p.status}</td>
                 <td className="p-3">{p.published ? "Yes" : "No"}</td>
                 <td className="p-3 text-right">
