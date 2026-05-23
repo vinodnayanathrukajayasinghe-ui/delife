@@ -28,6 +28,7 @@ import { Route as AdminPagesRouteImport } from './routes/admin.pages'
 import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
 import { Route as ApiPublicLeadsRouteImport } from './routes/api/public/leads'
 import { Route as AdminProjectsIdRouteImport } from './routes/admin.projects.$id'
+import { Route as AdminPagesIdRouteImport } from './routes/admin.pages.$id'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -124,6 +125,11 @@ const AdminProjectsIdRoute = AdminProjectsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AdminProjectsRoute,
 } as any)
+const AdminPagesIdRoute = AdminPagesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AdminPagesRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -138,11 +144,12 @@ export interface FileRoutesByFullPath {
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/leads': typeof AdminLeadsRoute
-  '/admin/pages': typeof AdminPagesRoute
+  '/admin/pages': typeof AdminPagesRouteWithChildren
   '/admin/projects': typeof AdminProjectsRouteWithChildren
   '/admin/settings': typeof AdminSettingsRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/admin/pages/$id': typeof AdminPagesIdRoute
   '/admin/projects/$id': typeof AdminProjectsIdRoute
   '/api/public/leads': typeof ApiPublicLeadsRoute
 }
@@ -158,11 +165,12 @@ export interface FileRoutesByTo {
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/leads': typeof AdminLeadsRoute
-  '/admin/pages': typeof AdminPagesRoute
+  '/admin/pages': typeof AdminPagesRouteWithChildren
   '/admin/projects': typeof AdminProjectsRouteWithChildren
   '/admin/settings': typeof AdminSettingsRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/admin': typeof AdminIndexRoute
+  '/admin/pages/$id': typeof AdminPagesIdRoute
   '/admin/projects/$id': typeof AdminProjectsIdRoute
   '/api/public/leads': typeof ApiPublicLeadsRoute
 }
@@ -180,11 +188,12 @@ export interface FileRoutesById {
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/leads': typeof AdminLeadsRoute
-  '/admin/pages': typeof AdminPagesRoute
+  '/admin/pages': typeof AdminPagesRouteWithChildren
   '/admin/projects': typeof AdminProjectsRouteWithChildren
   '/admin/settings': typeof AdminSettingsRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/admin/pages/$id': typeof AdminPagesIdRoute
   '/admin/projects/$id': typeof AdminProjectsIdRoute
   '/api/public/leads': typeof ApiPublicLeadsRoute
 }
@@ -208,6 +217,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/projects/$slug'
     | '/admin/'
+    | '/admin/pages/$id'
     | '/admin/projects/$id'
     | '/api/public/leads'
   fileRoutesByTo: FileRoutesByTo
@@ -228,6 +238,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/projects/$slug'
     | '/admin'
+    | '/admin/pages/$id'
     | '/admin/projects/$id'
     | '/api/public/leads'
   id:
@@ -249,6 +260,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/projects/$slug'
     | '/admin/'
+    | '/admin/pages/$id'
     | '/admin/projects/$id'
     | '/api/public/leads'
   fileRoutesById: FileRoutesById
@@ -403,8 +415,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProjectsIdRouteImport
       parentRoute: typeof AdminProjectsRoute
     }
+    '/admin/pages/$id': {
+      id: '/admin/pages/$id'
+      path: '/$id'
+      fullPath: '/admin/pages/$id'
+      preLoaderRoute: typeof AdminPagesIdRouteImport
+      parentRoute: typeof AdminPagesRoute
+    }
   }
 }
+
+interface AdminPagesRouteChildren {
+  AdminPagesIdRoute: typeof AdminPagesIdRoute
+}
+
+const AdminPagesRouteChildren: AdminPagesRouteChildren = {
+  AdminPagesIdRoute: AdminPagesIdRoute,
+}
+
+const AdminPagesRouteWithChildren = AdminPagesRoute._addFileChildren(
+  AdminPagesRouteChildren,
+)
 
 interface AdminProjectsRouteChildren {
   AdminProjectsIdRoute: typeof AdminProjectsIdRoute
@@ -420,7 +451,7 @@ const AdminProjectsRouteWithChildren = AdminProjectsRoute._addFileChildren(
 
 interface AdminRouteChildren {
   AdminLeadsRoute: typeof AdminLeadsRoute
-  AdminPagesRoute: typeof AdminPagesRoute
+  AdminPagesRoute: typeof AdminPagesRouteWithChildren
   AdminProjectsRoute: typeof AdminProjectsRouteWithChildren
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -428,7 +459,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminLeadsRoute: AdminLeadsRoute,
-  AdminPagesRoute: AdminPagesRoute,
+  AdminPagesRoute: AdminPagesRouteWithChildren,
   AdminProjectsRoute: AdminProjectsRouteWithChildren,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminIndexRoute: AdminIndexRoute,
