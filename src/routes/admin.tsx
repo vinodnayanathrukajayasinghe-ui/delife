@@ -24,29 +24,26 @@ function AdminLayout() {
 
   useEffect(() => {
     let active = true;
-    const check = async () => {
-      const { data } = await supabase.auth.getSession();
+    // Fast path: render as soon as we have a local session; verify admin role in background.
+    supabase.auth.getSession().then(({ data }) => {
+      if (!active) return;
       if (!data.session) {
         navigate({ to: "/login" });
         return;
       }
-      // Verify admin role via RLS-protected query
-      const { data: row, error } = await supabase
+      setEmail(data.session.user.email ?? null);
+      setReady(true);
+      supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", data.session.user.id)
         .eq("role", "admin")
-        .maybeSingle();
-      if (!active) return;
-      if (error || !row) {
-        setForbidden(true);
-        setReady(true);
-        return;
-      }
-      setEmail(data.session.user.email ?? null);
-      setReady(true);
-    };
-    check();
+        .maybeSingle()
+        .then(({ data: row, error }) => {
+          if (!active) return;
+          if (error || !row) setForbidden(true);
+        });
+    });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => {
       if (!s) navigate({ to: "/login" });
     });
