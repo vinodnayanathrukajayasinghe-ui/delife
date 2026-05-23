@@ -27,6 +27,7 @@ import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminProjectsRouteImport } from './routes/admin.projects'
 import { Route as AdminPagesRouteImport } from './routes/admin.pages'
 import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
+import { Route as AdminGalleryRouteImport } from './routes/admin.gallery'
 import { Route as ApiPublicLeadsRouteImport } from './routes/api/public/leads'
 import { Route as AdminProjectsIdRouteImport } from './routes/admin.projects.$id'
 import { Route as AdminPagesIdRouteImport } from './routes/admin.pages.$id'
@@ -121,6 +122,11 @@ const AdminLeadsRoute = AdminLeadsRouteImport.update({
   path: '/leads',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminGalleryRoute = AdminGalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
+  getParentRoute: () => AdminRoute,
+} as any)
 const ApiPublicLeadsRoute = ApiPublicLeadsRouteImport.update({
   id: '/api/public/leads',
   path: '/api/public/leads',
@@ -149,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/projects': typeof ProjectsRouteWithChildren
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/gallery': typeof AdminGalleryRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/pages': typeof AdminPagesRouteWithChildren
   '/admin/projects': typeof AdminProjectsRouteWithChildren
@@ -171,6 +178,7 @@ export interface FileRoutesByTo {
   '/projects': typeof ProjectsRouteWithChildren
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/gallery': typeof AdminGalleryRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/pages': typeof AdminPagesRouteWithChildren
   '/admin/projects': typeof AdminProjectsRouteWithChildren
@@ -195,6 +203,7 @@ export interface FileRoutesById {
   '/projects': typeof ProjectsRouteWithChildren
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/gallery': typeof AdminGalleryRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/pages': typeof AdminPagesRouteWithChildren
   '/admin/projects': typeof AdminProjectsRouteWithChildren
@@ -220,6 +229,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/services'
     | '/sitemap.xml'
+    | '/admin/gallery'
     | '/admin/leads'
     | '/admin/pages'
     | '/admin/projects'
@@ -242,6 +252,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/services'
     | '/sitemap.xml'
+    | '/admin/gallery'
     | '/admin/leads'
     | '/admin/pages'
     | '/admin/projects'
@@ -265,6 +276,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/services'
     | '/sitemap.xml'
+    | '/admin/gallery'
     | '/admin/leads'
     | '/admin/pages'
     | '/admin/projects'
@@ -421,6 +433,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLeadsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/gallery': {
+      id: '/admin/gallery'
+      path: '/gallery'
+      fullPath: '/admin/gallery'
+      preLoaderRoute: typeof AdminGalleryRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/api/public/leads': {
       id: '/api/public/leads'
       path: '/api/public/leads'
@@ -470,6 +489,7 @@ const AdminProjectsRouteWithChildren = AdminProjectsRoute._addFileChildren(
 )
 
 interface AdminRouteChildren {
+  AdminGalleryRoute: typeof AdminGalleryRoute
   AdminLeadsRoute: typeof AdminLeadsRoute
   AdminPagesRoute: typeof AdminPagesRouteWithChildren
   AdminProjectsRoute: typeof AdminProjectsRouteWithChildren
@@ -478,6 +498,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminGalleryRoute: AdminGalleryRoute,
   AdminLeadsRoute: AdminLeadsRoute,
   AdminPagesRoute: AdminPagesRouteWithChildren,
   AdminProjectsRoute: AdminProjectsRouteWithChildren,

@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { LogOut, LayoutDashboard, Briefcase, Mail, Settings, FileText } from "lucide-react";
+import { LogOut, LayoutDashboard, Briefcase, Mail, Settings, FileText, Images } from "lucide-react";
 import { brand } from "@/lib/site";
 import { supabase } from "@/integrations/supabase/client";
 import { signOut } from "@/lib/auth";
@@ -79,6 +79,7 @@ function AdminLayout() {
   const nav: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
     { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
     { to: "/admin/projects", label: "Projects", icon: Briefcase },
+    { to: "/admin/gallery", label: "Gallery", icon: Images },
     { to: "/admin/pages", label: "Pages", icon: FileText },
     { to: "/admin/leads", label: "Leads", icon: Mail },
     { to: "/admin/settings", label: "Site Settings", icon: Settings },

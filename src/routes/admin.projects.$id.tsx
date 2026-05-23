@@ -69,6 +69,13 @@ function ProjectEditor() {
     }
   }
 
+  async function uploadFiles(files: File[], kind: "gallery" | "before" | "after") {
+    for (const file of files) {
+      await uploadFile(file, kind, kind === "gallery" ? undefined : crypto.randomUUID());
+    }
+    qc.invalidateQueries({ queryKey: ["admin", "project", id] });
+  }
+
   if (q.isLoading || !form) {
     return <div className="text-sm text-muted-foreground">Loading editor…</div>;
   }
@@ -148,16 +155,16 @@ function ProjectEditor() {
             ) : (
               <div className="mt-2 grid aspect-[4/3] w-full place-items-center rounded-lg border border-dashed border-border text-xs text-muted-foreground">No cover yet</div>
             )}
-            <FileButton label="Upload cover" onFile={(f) => uploadFile(f, "cover")} />
+            <FileButton label="Upload cover" onFiles={([f]) => f ? uploadFile(f, "cover") : undefined} />
           </div>
         </div>
       </div>
 
-      <ImageSection title="Gallery" images={gallery} onUpload={(f) => uploadFile(f, "gallery")} onDelete={(i) => removeImage.mutate(i)} />
+      <ImageSection title="Gallery" images={gallery} onUpload={(files) => uploadFiles(files, "gallery")} onDelete={(i) => removeImage.mutate(i)} />
       <BeforeAfterSection
         before={beforeImgs}
         after={afterImgs}
-        onUpload={(f, kind, pairId) => uploadFile(f, kind, pairId)}
+        onUpload={(files, kind) => uploadFiles(files, kind)}
         onDelete={(i) => removeImage.mutate(i)}
       />
 
@@ -175,7 +182,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-function FileButton({ label, onFile }: { label: string; onFile: (f: File) => void | Promise<void> }) {
+function FileButton({ label, multiple = false, onFiles }: { label: string; multiple?: boolean; onFiles: (files: File[]) => void | Promise<void> }) {
   const [busy, setBusy] = useState(false);
   return (
     <label className={`mt-2 inline-flex cursor-pointer items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold hover:border-primary hover:text-primary ${busy ? "opacity-60" : ""}`}>
@@ -184,23 +191,24 @@ function FileButton({ label, onFile }: { label: string; onFile: (f: File) => voi
         type="file"
         accept="image/*"
         className="hidden"
+        multiple={multiple}
         onChange={async (e) => {
-          const f = e.target.files?.[0];
-          if (!f) return;
+          const files = Array.from(e.target.files ?? []);
+          if (files.length === 0) return;
           setBusy(true);
-          try { await onFile(f); } catch (err: any) { alert(err?.message ?? "Upload failed"); } finally { setBusy(false); e.target.value = ""; }
+          try { await onFiles(files); } catch (err: any) { alert(err?.message ?? "Upload failed"); } finally { setBusy(false); e.target.value = ""; }
         }}
       />
     </label>
   );
 }
 
-function ImageSection({ title, images, onUpload, onDelete }: { title: string; images: any[]; onUpload: (f: File) => Promise<void>; onDelete: (id: string) => void; }) {
+function ImageSection({ title, images, onUpload, onDelete }: { title: string; images: any[]; onUpload: (files: File[]) => Promise<void>; onDelete: (id: string) => void; }) {
   return (
     <div className="rounded-xl border border-border bg-card p-5 shadow-card">
       <div className="flex items-center justify-between">
         <h2 className="font-display text-lg">{title}</h2>
-        <FileButton label="Add image" onFile={onUpload} />
+        <FileButton label="Add images" multiple onFiles={onUpload} />
       </div>
       {images.length === 0 ? (
         <p className="mt-3 text-xs text-muted-foreground">No images yet.</p>
@@ -220,15 +228,15 @@ function ImageSection({ title, images, onUpload, onDelete }: { title: string; im
   );
 }
 
-function BeforeAfterSection({ before, after, onUpload, onDelete }: { before: any[]; after: any[]; onUpload: (f: File, kind: "before" | "after", pairId?: string) => Promise<void>; onDelete: (id: string) => void; }) {
+function BeforeAfterSection({ before, after, onUpload, onDelete }: { before: any[]; after: any[]; onUpload: (files: File[], kind: "before" | "after") => Promise<void>; onDelete: (id: string) => void; }) {
   // Group by pair_id; orphans displayed under "Unpaired"
   return (
     <div className="rounded-xl border border-border bg-card p-5 shadow-card">
       <div className="flex items-center justify-between">
         <h2 className="font-display text-lg">Before / After</h2>
         <div className="flex gap-2">
-          <FileButton label="Add Before" onFile={(f) => onUpload(f, "before", crypto.randomUUID())} />
-          <FileButton label="Add After" onFile={(f) => onUpload(f, "after", crypto.randomUUID())} />
+          <FileButton label="Add Before" multiple onFiles={(files) => onUpload(files, "before")} />
+          <FileButton label="Add After" multiple onFiles={(files) => onUpload(files, "after")} />
         </div>
       </div>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
