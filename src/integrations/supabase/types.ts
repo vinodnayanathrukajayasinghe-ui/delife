@@ -14,16 +14,324 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      gallery_images: {
+        Row: {
+          caption: string | null
+          category: string | null
+          created_at: string
+          display_order: number
+          id: string
+          published: boolean
+          url: string
+        }
+        Insert: {
+          caption?: string | null
+          category?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          published?: boolean
+          url: string
+        }
+        Update: {
+          caption?: string | null
+          category?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          published?: boolean
+          url?: string
+        }
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          message: string | null
+          name: string
+          page_url: string | null
+          phone: string | null
+          source: Database["public"]["Enums"]["lead_source"]
+          status: Database["public"]["Enums"]["lead_status"]
+          subject: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          message?: string | null
+          name: string
+          page_url?: string | null
+          phone?: string | null
+          source: Database["public"]["Enums"]["lead_source"]
+          status?: Database["public"]["Enums"]["lead_status"]
+          subject?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          message?: string | null
+          name?: string
+          page_url?: string | null
+          phone?: string | null
+          source?: Database["public"]["Enums"]["lead_source"]
+          status?: Database["public"]["Enums"]["lead_status"]
+          subject?: string | null
+        }
+        Relationships: []
+      }
+      page_blocks: {
+        Row: {
+          body: string | null
+          id: string
+          key: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          body?: string | null
+          id?: string
+          key: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          body?: string | null
+          id?: string
+          key?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      project_images: {
+        Row: {
+          caption: string | null
+          created_at: string
+          display_order: number
+          id: string
+          kind: Database["public"]["Enums"]["project_image_kind"]
+          pair_id: string | null
+          project_id: string
+          url: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          kind?: Database["public"]["Enums"]["project_image_kind"]
+          pair_id?: string | null
+          project_id: string
+          url: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          kind?: Database["public"]["Enums"]["project_image_kind"]
+          pair_id?: string | null
+          project_id?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_images_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projects: {
+        Row: {
+          category: string | null
+          client: string | null
+          completion_date: string | null
+          cover_image_url: string | null
+          created_at: string
+          description: string | null
+          display_order: number
+          featured: boolean
+          id: string
+          location: string | null
+          published: boolean
+          slug: string
+          status: Database["public"]["Enums"]["project_status"]
+          summary: string | null
+          title: string
+          updated_at: string
+          year: number | null
+        }
+        Insert: {
+          category?: string | null
+          client?: string | null
+          completion_date?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          featured?: boolean
+          id?: string
+          location?: string | null
+          published?: boolean
+          slug: string
+          status?: Database["public"]["Enums"]["project_status"]
+          summary?: string | null
+          title: string
+          updated_at?: string
+          year?: number | null
+        }
+        Update: {
+          category?: string | null
+          client?: string | null
+          completion_date?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          featured?: boolean
+          id?: string
+          location?: string | null
+          published?: boolean
+          slug?: string
+          status?: Database["public"]["Enums"]["project_status"]
+          summary?: string | null
+          title?: string
+          updated_at?: string
+          year?: number | null
+        }
+        Relationships: []
+      }
+      services: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_order: number
+          icon: string | null
+          id: string
+          published: boolean
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          icon?: string | null
+          id?: string
+          published?: boolean
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          icon?: string | null
+          id?: string
+          published?: boolean
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          address: string | null
+          created_at: string
+          email: string | null
+          facebook_url: string | null
+          hero_headline: string | null
+          hero_subheadline: string | null
+          id: string
+          instagram_url: string | null
+          linkedin_url: string | null
+          notification_email: string | null
+          phone: string | null
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          email?: string | null
+          facebook_url?: string | null
+          hero_headline?: string | null
+          hero_subheadline?: string | null
+          id?: string
+          instagram_url?: string | null
+          linkedin_url?: string | null
+          notification_email?: string | null
+          phone?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          email?: string | null
+          facebook_url?: string | null
+          hero_headline?: string | null
+          hero_subheadline?: string | null
+          id?: string
+          instagram_url?: string | null
+          linkedin_url?: string | null
+          notification_email?: string | null
+          phone?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin"
+      lead_source: "contact_form" | "whatsapp_inquiry"
+      lead_status: "new" | "contacted" | "closed"
+      project_image_kind: "gallery" | "before" | "after"
+      project_status: "completed" | "ongoing" | "upcoming"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +458,12 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin"],
+      lead_source: ["contact_form", "whatsapp_inquiry"],
+      lead_status: ["new", "contacted", "closed"],
+      project_image_kind: ["gallery", "before", "after"],
+      project_status: ["completed", "ongoing", "upcoming"],
+    },
   },
 } as const
