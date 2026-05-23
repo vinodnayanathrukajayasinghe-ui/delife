@@ -1,9 +1,22 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowRight, CheckCircle2, MessageCircle, Phone, Sparkles } from "lucide-react";
-import { brand, contact, processSteps, projects, services, testimonials, waLink, whyChooseUs } from "@/lib/site";
+import { listPublicProjects } from "@/lib/projects.functions";
+import { projectCover, projectTitle } from "@/lib/project-view";
+import { brand, contact, processSteps, services, testimonials, waLink, whyChooseUs } from "@/lib/site";
 import { SectionHeading } from "@/components/SectionHeading";
 
+const featuredProjectsQuery = queryOptions({
+  queryKey: ["public-projects", "featured"],
+  queryFn: async () => {
+    const projects = await listPublicProjects();
+    const featured = projects.filter((project) => project.featured);
+    return (featured.length > 0 ? featured : projects).slice(0, 6);
+  },
+});
+
 export const Route = createFileRoute("/")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(featuredProjectsQuery),
   head: () => ({
     meta: [
       { title: `${brand.name} | Elegant Interior Designing & Contracting` },
@@ -17,7 +30,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const featured = projects.slice(0, 6);
+  const { data: featured } = useSuspenseQuery(featuredProjectsQuery);
   return (
     <>
       {/* HERO */}
@@ -150,13 +163,13 @@ function Home() {
           </div>
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {featured.map((p) => (
-              <Link key={p.slug} to="/projects/$slug" params={{ slug: p.slug }} className="group overflow-hidden rounded-xl border border-border bg-card shadow-card transition hover:-translate-y-1 hover:shadow-elegant">
+              <Link key={p.id} to="/projects/$slug" params={{ slug: p.slug }} className="group overflow-hidden rounded-xl border border-border bg-card shadow-card transition hover:-translate-y-1 hover:shadow-elegant">
                 <div className="aspect-[4/3] overflow-hidden">
-                  <img src={p.cover} alt={p.name} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+                  <img src={projectCover(p)} alt={projectTitle(p)} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
                 </div>
                 <div className="p-5">
-                  <div className="text-xs font-semibold uppercase tracking-wider text-[color:var(--gold)]">{p.category}</div>
-                  <h3 className="mt-1 font-display text-lg leading-tight">{p.name}</h3>
+                  {p.category && <div className="text-xs font-semibold uppercase tracking-wider text-[color:var(--gold)]">{p.category}</div>}
+                  <h3 className="mt-1 font-display text-lg leading-tight">{projectTitle(p)}</h3>
                   <div className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">View Project <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></div>
                 </div>
               </Link>

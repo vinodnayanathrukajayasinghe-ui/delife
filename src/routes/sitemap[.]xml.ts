@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
-import { projects } from "@/lib/site";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const BASE_URL = "";
 
@@ -9,6 +9,13 @@ export const Route = createFileRoute("/sitemap.xml")({
     handlers: {
       GET: async () => {
         const staticPaths = ["/", "/about-us", "/services", "/projects", "/gallery", "/company-profile", "/contact"];
+        const { data: projects, error } = await supabaseAdmin
+          .from("projects")
+          .select("slug")
+          .eq("published", true)
+          .order("display_order")
+          .order("created_at", { ascending: false });
+        if (error) throw new Error(error.message);
         const projectPaths = projects.map((p) => `/projects/${p.slug}`);
         const all = [...staticPaths, ...projectPaths];
         const urls = all.map(

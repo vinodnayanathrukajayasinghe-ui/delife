@@ -1,8 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { Download, Shield, Award, CheckCircle2 } from "lucide-react";
-import { brand, projects, services } from "@/lib/site";
+import { listPublicProjects } from "@/lib/projects.functions";
+import { projectCover, projectTitle } from "@/lib/project-view";
+import { brand, services } from "@/lib/site";
+
+const selectedProjectsQuery = queryOptions({
+  queryKey: ["public-projects", "company-profile"],
+  queryFn: async () => (await listPublicProjects()).slice(0, 6),
+});
 
 export const Route = createFileRoute("/company-profile")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(selectedProjectsQuery),
   head: () => ({
     meta: [
       { title: `Company Profile | ${brand.name}` },
@@ -16,6 +25,8 @@ export const Route = createFileRoute("/company-profile")({
 });
 
 function CompanyProfile() {
+  const { data: projects } = useSuspenseQuery(selectedProjectsQuery);
+
   return (
     <>
       <section className="border-b border-border bg-[color:var(--section)]">
@@ -65,11 +76,11 @@ function CompanyProfile() {
               <h2 className="font-display text-2xl">Selected Projects</h2>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 {projects.slice(0, 6).map((p) => (
-                  <Link key={p.slug} to="/projects/$slug" params={{ slug: p.slug }} className="group overflow-hidden rounded-xl border border-border bg-card shadow-card">
-                    <img src={p.cover} alt={p.name} className="aspect-[4/3] w-full object-cover transition group-hover:scale-105" />
+                  <Link key={p.id} to="/projects/$slug" params={{ slug: p.slug }} className="group overflow-hidden rounded-xl border border-border bg-card shadow-card">
+                    <img src={projectCover(p)} alt={projectTitle(p)} className="aspect-[4/3] w-full object-cover transition group-hover:scale-105" />
                     <div className="p-4">
-                      <div className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--gold)]">{p.category}</div>
-                      <div className="font-display">{p.name}</div>
+                      {p.category && <div className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--gold)]">{p.category}</div>}
+                      <div className="font-display">{projectTitle(p)}</div>
                     </div>
                   </Link>
                 ))}

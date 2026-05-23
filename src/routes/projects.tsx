@@ -1,9 +1,25 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
-import { brand, projects, projectCategories } from "@/lib/site";
+import { listPublicProjects } from "@/lib/projects.functions";
+import { brand } from "@/lib/site";
+import {
+  projectCategories,
+  projectCompletion,
+  projectCover,
+  projectStatusLabel,
+  projectSummary,
+  projectTitle,
+} from "@/lib/project-view";
+
+const projectsQuery = queryOptions({
+  queryKey: ["public-projects"],
+  queryFn: () => listPublicProjects(),
+});
 
 export const Route = createFileRoute("/projects")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(projectsQuery),
   head: () => ({
     meta: [
       { title: `Projects | ${brand.name}` },
@@ -17,7 +33,9 @@ export const Route = createFileRoute("/projects")({
 });
 
 function ProjectsPage() {
+  const { data: projects } = useSuspenseQuery(projectsQuery);
   const [cat, setCat] = useState("All");
+  const categories = projectCategories(projects);
   const filtered = cat === "All" ? projects : projects.filter((p) => p.category === cat);
 
   return (
@@ -34,7 +52,7 @@ function ProjectsPage() {
 
       <section className="container-px mx-auto max-w-7xl py-12">
         <div className="flex flex-wrap items-center justify-center gap-2">
-          {projectCategories.map((c) => (
+          {categories.map((c) => (
             <button
               key={c}
               onClick={() => setCat(c)}
@@ -51,17 +69,18 @@ function ProjectsPage() {
 
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((p) => (
-            <Link key={p.slug} to="/projects/$slug" params={{ slug: p.slug }} className="group overflow-hidden rounded-xl border border-border bg-card shadow-card transition hover:-translate-y-1 hover:shadow-elegant">
+            <Link key={p.id} to="/projects/$slug" params={{ slug: p.slug }} className="group overflow-hidden rounded-xl border border-border bg-card shadow-card transition hover:-translate-y-1 hover:shadow-elegant">
               <div className="relative aspect-[4/3] overflow-hidden">
-                <img src={p.cover} alt={p.name} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
-                <span className={`absolute right-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${p.status === "Completed" ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
-                  {p.status}
+                <img src={projectCover(p)} alt={projectTitle(p)} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+                <span className={`absolute right-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${p.status === "completed" ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
+                  {projectStatusLabel(p)}
                 </span>
               </div>
               <div className="p-5">
-                <div className="text-xs font-semibold uppercase tracking-wider text-[color:var(--gold)]">{p.category}</div>
-                <h2 className="mt-1 font-display text-lg leading-tight">{p.name}</h2>
-                <p className="mt-1 text-xs text-muted-foreground">{p.location} · {p.completion}</p>
+                {p.category && <div className="text-xs font-semibold uppercase tracking-wider text-[color:var(--gold)]">{p.category}</div>}
+                <h2 className="mt-1 font-display text-lg leading-tight">{projectTitle(p)}</h2>
+                <p className="mt-1 text-xs text-muted-foreground">{[p.location, projectCompletion(p)].filter(Boolean).join(" · ")}</p>
+                {projectSummary(p) && <p className="mt-3 line-clamp-2 text-sm text-muted-foreground">{projectSummary(p)}</p>}
                 <div className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">View Project <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></div>
               </div>
             </Link>
