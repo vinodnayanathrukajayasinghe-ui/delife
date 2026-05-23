@@ -31,6 +31,9 @@ const settingsSchema = z.object({
   linkedin_url: z.string().max(2000).optional().nullable(),
   hero_headline: z.string().max(200).optional().nullable(),
   hero_subheadline: z.string().max(400).optional().nullable(),
+  hero_image_url: z.string().max(2000).optional().nullable(),
+  hero_cta_label: z.string().max(80).optional().nullable(),
+  hero_cta_href: z.string().max(2000).optional().nullable(),
   notification_email: z.string().max(255).optional().nullable(),
 });
 
