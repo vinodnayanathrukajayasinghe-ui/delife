@@ -107,6 +107,51 @@ export type Database = {
         }
         Relationships: []
       }
+      pages: {
+        Row: {
+          content_html: string
+          created_at: string
+          display_order: number
+          excerpt: string | null
+          id: string
+          meta_description: string | null
+          meta_title: string | null
+          og_image_url: string | null
+          published: boolean
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content_html?: string
+          created_at?: string
+          display_order?: number
+          excerpt?: string | null
+          id?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          og_image_url?: string | null
+          published?: boolean
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content_html?: string
+          created_at?: string
+          display_order?: number
+          excerpt?: string | null
+          id?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          og_image_url?: string | null
+          published?: boolean
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       project_images: {
         Row: {
           caption: string | null
@@ -250,7 +295,10 @@ export type Database = {
           created_at: string
           email: string | null
           facebook_url: string | null
+          hero_cta_href: string | null
+          hero_cta_label: string | null
           hero_headline: string | null
+          hero_image_url: string | null
           hero_subheadline: string | null
           id: string
           instagram_url: string | null
@@ -265,7 +313,10 @@ export type Database = {
           created_at?: string
           email?: string | null
           facebook_url?: string | null
+          hero_cta_href?: string | null
+          hero_cta_label?: string | null
           hero_headline?: string | null
+          hero_image_url?: string | null
           hero_subheadline?: string | null
           id?: string
           instagram_url?: string | null
@@ -280,7 +331,10 @@ export type Database = {
           created_at?: string
           email?: string | null
           facebook_url?: string | null
+          hero_cta_href?: string | null
+          hero_cta_label?: string | null
           hero_headline?: string | null
+          hero_image_url?: string | null
           hero_subheadline?: string | null
           id?: string
           instagram_url?: string | null

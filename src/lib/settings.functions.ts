@@ -6,7 +6,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 export const getPublicSettings = createServerFn({ method: "GET" }).handler(async () => {
   const { data } = await supabaseAdmin
     .from("site_settings")
-    .select("phone,whatsapp,email,address,facebook_url,instagram_url,linkedin_url,hero_headline,hero_subheadline")
+    .select("phone,whatsapp,email,address,facebook_url,instagram_url,linkedin_url,hero_headline,hero_subheadline,hero_image_url,hero_cta_label,hero_cta_href")
     .limit(1)
     .maybeSingle();
   return data;
@@ -31,6 +31,9 @@ const settingsSchema = z.object({
   linkedin_url: z.string().max(2000).optional().nullable(),
   hero_headline: z.string().max(200).optional().nullable(),
   hero_subheadline: z.string().max(400).optional().nullable(),
+  hero_image_url: z.string().max(2000).optional().nullable(),
+  hero_cta_label: z.string().max(80).optional().nullable(),
+  hero_cta_href: z.string().max(2000).optional().nullable(),
   notification_email: z.string().max(255).optional().nullable(),
 });
 

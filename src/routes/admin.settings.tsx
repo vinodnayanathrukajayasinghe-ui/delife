@@ -53,6 +53,9 @@ function AdminSettings() {
         <div />
         <div className="sm:col-span-2">{f("Hero headline", "hero_headline")}</div>
         <div className="sm:col-span-2">{f("Hero subheadline", "hero_subheadline")}</div>
+        <div className="sm:col-span-2">{f("Hero background image URL", "hero_image_url")}</div>
+        {f("Hero CTA label", "hero_cta_label")}
+        {f("Hero CTA link", "hero_cta_href")}
       </div>
     </div>
   );
