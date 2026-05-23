@@ -32,7 +32,7 @@ function Home() {
           <div className="absolute inset-0 bg-grid-soft opacity-30" />
         </div>
 
-        <div className="container-px mx-auto grid max-w-7xl gap-12 py-20 md:py-28 lg:grid-cols-12 lg:py-32">
+        <div className="container-px mx-auto grid max-w-7xl gap-12 py-10 md:py-16 lg:grid-cols-12 lg:py-20">
           <div className="lg:col-span-7">
             <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur">
               <Sparkles className="h-3.5 w-3.5 text-[color:var(--gold)]" />
