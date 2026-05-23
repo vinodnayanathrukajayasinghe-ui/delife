@@ -18,13 +18,35 @@ export const Route = createFileRoute("/contact")({
 
 function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
+  const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState(false);
+  const [err, setErr] = useState("");
 
-  const buildMessage = () =>
-    `Hello DELIFE,%0A%0AName: ${form.name}%0AEmail: ${form.email}%0APhone: ${form.phone}%0A%0A${form.message}`;
-
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    window.open(`https://wa.me/${contact.whatsapp}?text=${buildMessage()}`, "_blank");
+    setErr("");
+    setBusy(true);
+    try {
+      const res = await fetch("/api/public/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          source: "contact_form",
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          message: form.message,
+          page_url: typeof window !== "undefined" ? window.location.href : "",
+        }),
+      });
+      if (!res.ok) throw new Error((await res.json().catch(() => ({})))?.error || "Could not send");
+      setDone(true);
+      setForm({ name: "", email: "", phone: "", message: "" });
+    } catch (e: any) {
+      setErr(e?.message ?? "Could not send. Please try again or WhatsApp us.");
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -44,19 +66,21 @@ function ContactPage() {
           <div className="lg:col-span-3">
             <form onSubmit={onSubmit} className="rounded-2xl border border-border bg-card p-6 shadow-card sm:p-8">
               <h2 className="font-display text-2xl">Send us a message</h2>
-              <p className="mt-1 text-sm text-muted-foreground">Submitting routes your inquiry directly to our WhatsApp.</p>
+              <p className="mt-1 text-sm text-muted-foreground">Your inquiry is sent directly to our team.</p>
+              {done && <p className="mt-3 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-800">Thank you — we've received your message and will get back to you shortly.</p>}
+              {err && <p className="mt-3 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{err}</p>}
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
                 <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Your name" className="rounded-lg border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary" />
-                <input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="Email" className="rounded-lg border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary" />
+                <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="Email" className="rounded-lg border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary" />
                 <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="Phone" className="rounded-lg border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary sm:col-span-2" />
                 <textarea required rows={5} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder="Tell us about your project…" className="rounded-lg border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary sm:col-span-2" />
               </div>
               <div className="mt-5 flex flex-wrap gap-3">
-                <button type="submit" className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white shadow-card hover:opacity-95" style={{ backgroundColor: "#25D366" }}>
-                  <Send className="h-4 w-4" /> Send on WhatsApp
+                <button type="submit" disabled={busy} className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-card hover:opacity-95 disabled:opacity-60">
+                  <Send className="h-4 w-4" /> {busy ? "Sending…" : "Send message"}
                 </button>
-                <a href={`mailto:${contact.email}?subject=Project%20Inquiry&body=${buildMessage()}`} className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground hover:border-primary hover:text-primary">
-                  <Mail className="h-4 w-4" /> Email us instead
+                <a href={waLink(`Hi DELIFE, I'd like to inquire about a project.`)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white shadow-card hover:opacity-95" style={{ backgroundColor: "#25D366" }}>
+                  <MessageCircle className="h-4 w-4" /> WhatsApp us
                 </a>
               </div>
             </form>

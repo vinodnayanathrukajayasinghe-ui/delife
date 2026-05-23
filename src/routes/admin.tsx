@@ -1,8 +1,9 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { LogOut, LayoutDashboard, FileText, Briefcase, Image as ImageIcon, Settings, Users, Mail } from "lucide-react";
-import { brand, projects, services } from "@/lib/site";
-import { isAuthed, logout } from "@/lib/auth";
+import { LogOut, LayoutDashboard, Briefcase, Mail, Settings } from "lucide-react";
+import { brand } from "@/lib/site";
+import { supabase } from "@/integrations/supabase/client";
+import { signOut } from "@/lib/auth";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -11,42 +12,78 @@ export const Route = createFileRoute("/admin")({
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),
-  component: Admin,
+  component: AdminLayout,
 });
 
-function Admin() {
+function AdminLayout() {
   const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [ready, setReady] = useState(false);
+  const [email, setEmail] = useState<string | null>(null);
+  const [forbidden, setForbidden] = useState(false);
 
   useEffect(() => {
-    if (!isAuthed()) navigate({ to: "/admin-login" });
-    else setReady(true);
+    let active = true;
+    const check = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
+        navigate({ to: "/login" });
+        return;
+      }
+      // Verify admin role via RLS-protected query
+      const { data: row, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", data.session.user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+      if (!active) return;
+      if (error || !row) {
+        setForbidden(true);
+        setReady(true);
+        return;
+      }
+      setEmail(data.session.user.email ?? null);
+      setReady(true);
+    };
+    check();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => {
+      if (!s) navigate({ to: "/login" });
+    });
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
   }, [navigate]);
 
-  if (!ready) return null;
+  if (!ready) {
+    return <div className="grid min-h-[60vh] place-items-center text-sm text-muted-foreground">Checking access…</div>;
+  }
 
-  const stats = [
-    { label: "Projects", value: projects.length, icon: Briefcase },
-    { label: "Services", value: services.length, icon: FileText },
-    { label: "Gallery items", value: 16, icon: ImageIcon },
-    { label: "Inquiries", value: 0, icon: Mail },
-  ];
+  if (forbidden) {
+    return (
+      <div className="grid min-h-[60vh] place-items-center px-4 text-center">
+        <div className="max-w-md">
+          <h1 className="font-display text-2xl">Access denied</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Your account is signed in but does not have admin access. Ask a site administrator to grant the admin role to your account.
+          </p>
+          <button
+            onClick={async () => { await signOut(); navigate({ to: "/login" }); }}
+            className="mt-6 inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold hover:border-primary hover:text-primary"
+          >
+            <LogOut className="h-4 w-4" /> Sign out
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-  const sections = [
-    { title: "Home page content", desc: "Hero, highlights and CTA editor." },
-    { title: "About / Vision / Mission", desc: "Update company story and values." },
-    { title: "Services manager", desc: "Add, edit, reorder or remove services." },
-    { title: "Projects manager", desc: "Manage projects, categories and gallery." },
-    { title: "Gallery manager", desc: "Upload and categorize gallery images." },
-    { title: "Company Profile PDF", desc: "Replace the downloadable PDF." },
-    { title: "Contact details", desc: "Phone, email, address and hours." },
-    { title: "WhatsApp number", desc: "Update the WhatsApp inquiry number." },
-    { title: "Social links", desc: "Edit Facebook and social profile URLs." },
-    { title: "SEO manager", desc: "Per-page titles, descriptions, OG tags." },
-    { title: "Testimonials", desc: "Manage client testimonials." },
-    { title: "Logo & favicon", desc: "Update brand assets." },
-    { title: "Inquiries", desc: "View and respond to submissions." },
-    { title: "Password", desc: "Change your admin password." },
+  const nav: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
+    { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
+    { to: "/admin/projects", label: "Projects", icon: Briefcase },
+    { to: "/admin/leads", label: "Leads", icon: Mail },
+    { to: "/admin/settings", label: "Site Settings", icon: Settings },
   ];
 
   return (
@@ -57,56 +94,40 @@ function Admin() {
             <img src={brand.logoIcon} alt="" className="h-9 w-9" />
             <span className="font-display text-lg">Admin Console</span>
           </Link>
-          <button
-            onClick={() => { logout(); navigate({ to: "/admin-login" }); }}
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold hover:border-primary hover:text-primary"
-          >
-            <LogOut className="h-4 w-4" /> Sign out
-          </button>
+          <div className="flex items-center gap-3">
+            {email && <span className="hidden text-xs text-muted-foreground sm:inline">{email}</span>}
+            <button
+              onClick={async () => { await signOut(); navigate({ to: "/login" }); }}
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold hover:border-primary hover:text-primary"
+            >
+              <LogOut className="h-4 w-4" /> Sign out
+            </button>
+          </div>
         </div>
       </header>
 
-      <main className="container-px mx-auto max-w-7xl py-10">
-        <div className="flex items-center gap-3">
-          <LayoutDashboard className="h-5 w-5 text-primary" />
-          <h1 className="font-display text-2xl">Dashboard</h1>
-        </div>
-        <p className="mt-1 text-sm text-muted-foreground">Welcome back. Manage your website content from one place.</p>
-
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map(({ label, value, icon: Icon }) => (
-            <div key={label} className="rounded-xl border border-border bg-card p-5 shadow-card">
-              <div className="flex items-center justify-between">
-                <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
-                <Icon className="h-4 w-4 text-[color:var(--gold)]" />
-              </div>
-              <div className="mt-2 font-display text-3xl text-primary">{value}</div>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-10">
-          <div className="flex items-center gap-2">
-            <Settings className="h-4 w-4 text-primary" />
-            <h2 className="font-display text-xl">Manage content</h2>
-          </div>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {sections.map((s) => (
-              <div key={s.title} className="rounded-xl border border-border bg-card p-5 shadow-card">
-                <h3 className="font-display text-base">{s.title}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{s.desc}</p>
-                <button disabled className="mt-4 inline-flex cursor-not-allowed items-center gap-2 rounded-full border border-border bg-secondary px-4 py-2 text-xs font-semibold text-muted-foreground">
-                  Connect backend to enable
-                </button>
-              </div>
-            ))}
-          </div>
-          <div className="mt-6 flex items-start gap-3 rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground shadow-card">
-            <Users className="mt-0.5 h-4 w-4 text-primary" />
-            <p>Editing actions require a backend (database + file storage + auth). Enable Lovable Cloud and ask to wire up the admin CMS — projects, services, gallery uploads, contact details and SEO will all become editable from this console.</p>
-          </div>
-        </div>
-      </main>
+      <div className="container-px mx-auto max-w-7xl py-6">
+        <nav className="mb-6 flex flex-wrap gap-2">
+          {nav.map((n) => {
+            const active = n.exact ? pathname === n.to : pathname.startsWith(n.to);
+            return (
+              <Link
+                key={n.to}
+                to={n.to as any}
+                className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold transition ${
+                  active
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-card text-foreground/80 hover:border-primary hover:text-primary"
+                }`}
+              >
+                <n.icon className="h-3.5 w-3.5" />
+                {n.label}
+              </Link>
+            );
+          })}
+        </nav>
+        <Outlet />
+      </div>
     </div>
   );
 }
