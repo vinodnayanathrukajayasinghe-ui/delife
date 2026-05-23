@@ -113,7 +113,7 @@ function AdminLayout() {
             return (
               <Link
                 key={n.to}
-                to={n.to}
+                to={n.to as any}
                 className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold transition ${
                   active
                     ? "border-primary bg-primary text-primary-foreground"
