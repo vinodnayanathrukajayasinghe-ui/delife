@@ -15,6 +15,41 @@ const featuredProjectsQuery = queryOptions({
   },
 });
 
+const homeImages = {
+  about:
+    "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1400&q=80",
+  why: [
+    "https://images.unsplash.com/photo-1616486701797-0f33f61038ec?auto=format&fit=crop&w=900&q=80",
+    "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=900&q=80",
+    "https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&w=900&q=80",
+    "https://images.unsplash.com/photo-1581091870622-1e7e4e0f20d6?auto=format&fit=crop&w=900&q=80",
+    "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80",
+    "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=900&q=80",
+  ],
+  services: {
+    "interior-designing":
+      "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=900&q=80",
+    "3d-design-visualization":
+      "https://images.unsplash.com/photo-1545558014-8692077e9b5c?auto=format&fit=crop&w=900&q=80",
+    "house-planning":
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=80",
+    "concept-drawings":
+      "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=900&q=80",
+    "boq-estimation":
+      "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=900&q=80",
+    "fit-out-works":
+      "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=900&q=80",
+  } satisfies Record<string, string>,
+  process: [
+    "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=700&q=80",
+    "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=700&q=80",
+    "https://images.unsplash.com/photo-1545558014-8692077e9b5c?auto=format&fit=crop&w=700&q=80",
+    "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=700&q=80",
+    "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=700&q=80",
+    "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=700&q=80",
+  ],
+};
+
 export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.fetchQuery(featuredProjectsQuery),
   head: () => ({
@@ -101,7 +136,7 @@ function Home() {
       <section className="container-px mx-auto max-w-7xl py-20">
         <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
           <div className="relative">
-            <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=1400&q=80" alt="Bespoke kitchen joinery" className="aspect-[5/4] w-full rounded-2xl object-cover shadow-card" />
+            <img src={homeImages.about} alt="Completed premium interior living space" className="aspect-[5/4] w-full rounded-2xl object-cover shadow-card" />
             <img src={brand.logoIcon} alt="" className="absolute -bottom-8 -right-6 hidden h-32 w-32 rounded-full bg-card p-3 shadow-elegant ring-1 ring-border md:block" />
           </div>
           <div>
@@ -126,10 +161,15 @@ function Home() {
           <SectionHeading center eyebrow="Why DELIFE" title="Built around quality, creativity and delivery" />
           <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {whyChooseUs.map((w, i) => (
-              <div key={w.title} className="group relative rounded-xl border border-border bg-card p-6 shadow-card transition hover:-translate-y-1 hover:shadow-elegant">
-                <div className="font-display text-sm text-[color:var(--gold)]">0{i + 1}</div>
-                <h3 className="mt-2 font-display text-xl text-foreground">{w.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{w.desc}</p>
+              <div key={w.title} className="group overflow-hidden rounded-xl border border-border bg-card shadow-card transition hover:-translate-y-1 hover:shadow-elegant">
+                <div className="aspect-[16/9] overflow-hidden">
+                  <img src={homeImages.why[i]} alt={w.title} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+                </div>
+                <div className="p-6">
+                  <div className="font-display text-sm text-[color:var(--gold)]">0{i + 1}</div>
+                  <h3 className="mt-2 font-display text-xl text-foreground">{w.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{w.desc}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -144,11 +184,15 @@ function Home() {
         </div>
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {services.slice(0, 6).map((s) => (
-            <Link key={s.slug} to="/services" className="group relative overflow-hidden rounded-xl border border-border bg-card p-6 shadow-card transition hover:-translate-y-1 hover:shadow-elegant">
-              <div className="absolute right-0 top-0 h-24 w-24 -translate-y-8 translate-x-8 rounded-full bg-[color:var(--section)] transition group-hover:bg-[color:var(--gold-soft)]/40" />
-              <h3 className="relative font-display text-xl">{s.title}</h3>
-              <p className="relative mt-2 text-sm text-muted-foreground">{s.short}</p>
-              <div className="relative mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">Learn more <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></div>
+            <Link key={s.slug} to="/services" className="group overflow-hidden rounded-xl border border-border bg-card shadow-card transition hover:-translate-y-1 hover:shadow-elegant">
+              <div className="aspect-[16/9] overflow-hidden">
+                <img src={homeImages.services[s.slug]} alt={s.title} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+              </div>
+              <div className="p-6">
+                <h3 className="font-display text-xl">{s.title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">{s.short}</p>
+                <div className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">Learn more <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></div>
+              </div>
             </Link>
           ))}
         </div>
@@ -181,12 +225,15 @@ function Home() {
       {/* PROCESS */}
       <section className="container-px mx-auto max-w-7xl py-20">
         <SectionHeading center eyebrow="Our process" title="A clear, professional journey" subtitle="From the first conversation to final handover — every project is delivered through a disciplined six-step process." />
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
-          {processSteps.map((s) => (
-            <div key={s.n} className="rounded-xl border border-border bg-card p-5 text-center shadow-card">
-              <div className="font-display text-2xl text-[color:var(--gold)]">{s.n}</div>
-              <div className="mt-1 font-display text-lg">{s.title}</div>
-              <p className="mt-1 text-xs text-muted-foreground">{s.desc}</p>
+        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          {processSteps.map((s, i) => (
+            <div key={s.n} className="overflow-hidden rounded-xl border border-border bg-card text-center shadow-card">
+              <img src={homeImages.process[i]} alt={s.title} className="aspect-[4/3] w-full object-cover" />
+              <div className="p-5">
+                <div className="font-display text-2xl text-[color:var(--gold)]">{s.n}</div>
+                <div className="mt-1 font-display text-lg">{s.title}</div>
+                <p className="mt-1 text-xs text-muted-foreground">{s.desc}</p>
+              </div>
             </div>
           ))}
         </div>
