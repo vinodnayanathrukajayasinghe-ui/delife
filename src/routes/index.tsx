@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { ArrowRight, CheckCircle2, MessageCircle, Phone, Sparkles } from "lucide-react";
 import { listPublicProjects } from "@/lib/projects.functions";
 import { projectCover, projectTitle } from "@/lib/project-view";
@@ -21,6 +22,8 @@ const homeImages = {
     "https://inxzujmtwxulnawzfelc.supabase.co/storage/v1/object/public/project-media/gallery/1779565596923-a72d6w-45383136_389168851622253_3094791556180213760_n.jpg",
     "https://inxzujmtwxulnawzfelc.supabase.co/storage/v1/object/public/project-media/gallery/1779565597706-v79n92-45282663_389168768288928_8373255957228027904_n.jpg",
     "https://inxzujmtwxulnawzfelc.supabase.co/storage/v1/object/public/project-media/gallery/1779565602820-dcf4rf-45249923_389168251622313_6503404269461307392_n.jpg",
+    "https://inxzujmtwxulnawzfelc.supabase.co/storage/v1/object/public/project-media/gallery/1779565663842-rfk117-45301754_389167901622348_3229823481130516480_n.jpg",
+    "https://inxzujmtwxulnawzfelc.supabase.co/storage/v1/object/public/project-media/1779563281742-gtra53-150449385_1899567890184442_6502514476577355847_n.jpg",
   ],
   about:
     "https://inxzujmtwxulnawzfelc.supabase.co/storage/v1/object/public/project-media/gallery/1779565599846-7ntruc-45396841_389168441622294_4262364315220180992_n.jpg",
@@ -29,7 +32,7 @@ const homeImages = {
     "https://inxzujmtwxulnawzfelc.supabase.co/storage/v1/object/public/project-media/gallery/1779565596923-a72d6w-45383136_389168851622253_3094791556180213760_n.jpg",
     "https://inxzujmtwxulnawzfelc.supabase.co/storage/v1/object/public/project-media/gallery/1779565673761-cktq2p-36063078_304211293451343_7540940438279028736_n.jpg",
     "https://inxzujmtwxulnawzfelc.supabase.co/storage/v1/object/public/project-media/gallery/1779565588005-91x5ms-69653665_547357099136760_8581936061519757312_n.jpg",
-    "https://inxzujmtwxulnawzfelc.supabase.co/storage/v1/object/public/project-media/gallery/1779565678066-e14md2-486523916_1835359240336533_4783075265497774724_n__1_.jpg",
+    "https://inxzujmtwxulnawzfelc.supabase.co/storage/v1/object/public/project-media/gallery/1779565599846-7ntruc-45396841_389168441622294_4262364315220180992_n.jpg",
     "https://inxzujmtwxulnawzfelc.supabase.co/storage/v1/object/public/project-media/gallery/1779565583070-5edqso-69823596_547357839136686_7766305631522258944_n.jpg",
   ],
   services: {
@@ -69,6 +72,44 @@ export const Route = createFileRoute("/")({
   }),
   component: Home,
 });
+
+function HeroCarousel() {
+  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setActive((current) => (current + 1) % homeImages.hero.length);
+    }, 4200);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="relative ml-auto aspect-[4/5] w-full max-w-md overflow-hidden rounded-2xl shadow-elegant">
+      {homeImages.hero.map((src, index) => (
+        <img
+          key={src}
+          src={src}
+          alt="Completed DELIFE interior project gallery"
+          className={`absolute inset-0 h-full w-full object-cover transition duration-1000 ${
+            index === active ? "scale-100 opacity-100" : "scale-105 opacity-0"
+          }`}
+          loading={index === 0 ? "eager" : "lazy"}
+        />
+      ))}
+      <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-1.5 rounded-full bg-white/80 px-3 py-2 shadow-card backdrop-blur">
+        {homeImages.hero.map((src, index) => (
+          <button
+            key={src}
+            type="button"
+            aria-label={`Show completed project ${index + 1}`}
+            onClick={() => setActive(index)}
+            className={`h-1.5 rounded-full transition-all ${index === active ? "w-6 bg-primary" : "w-1.5 bg-primary/30"}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function Home() {
   const { data: featured } = useSuspenseQuery(featuredProjectsQuery);
@@ -126,13 +167,11 @@ function Home() {
           </div>
 
           <div className="relative lg:col-span-5">
-            <div className="relative ml-auto aspect-[4/5] w-full max-w-md overflow-hidden rounded-2xl shadow-elegant">
-              <img src={homeImages.hero[0]} alt="Completed DELIFE interior ceiling and lighting work" className="h-full w-full object-cover" />
-            </div>
+            <HeroCarousel />
             <div className="absolute -bottom-6 -left-4 hidden w-56 rounded-xl border border-border bg-card/95 p-4 shadow-card backdrop-blur md:block">
               <div className="text-xs uppercase tracking-wider text-muted-foreground">DELIFE Delivery</div>
               <div className="mt-1 font-display text-lg leading-tight">Design, fit-out and finishing by one team</div>
-              <div className="mt-1 text-xs text-muted-foreground">Western Province · 2024</div>
+              <div className="mt-1 text-xs text-muted-foreground">Completed project gallery</div>
             </div>
           </div>
         </div>
