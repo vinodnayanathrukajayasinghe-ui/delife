@@ -18,8 +18,29 @@ const profileImages = {
   detail:
     "https://inxzujmtwxulnawzfelc.supabase.co/storage/v1/object/public/project-media/gallery/1779565602820-dcf4rf-45249923_389168251622313_6503404269461307392_n.jpg",
   planning:
-    "https://inxzujmtwxulnawzfelc.supabase.co/storage/v1/object/public/project-media/gallery/1779565582086-alnger-70849714_547358065803330_151406221478330368_n.jpg",
+    "https://inxzujmtwxulnawzfelc.supabase.co/storage/v1/object/public/project-media/gallery/1779565663842-rfk117-45301754_389167901622348_3229823481130516480_n.jpg",
+  vision:
+    "https://images.pexels.com/photos/6580568/pexels-photo-6580568.jpeg?auto=compress&cs=tinysrgb&w=1200",
+  mission:
+    "https://images.pexels.com/photos/5584052/pexels-photo-5584052.jpeg?auto=compress&cs=tinysrgb&w=1200",
 };
+
+const companyStrengths = [
+  "Interior design and space planning",
+  "3D visualization and design development",
+  "BOQ preparation and transparent estimation",
+  "Ceiling, partition, flooring and wall finishing",
+  "Custom joinery, furniture and display systems",
+  "Site coordination, supervision and handover",
+];
+
+const sectors = ["Homes", "Offices", "Retail", "Restaurants", "Salons", "Banks", "Hotels", "Showrooms"];
+
+const deliveryStandards = [
+  { title: "Clear Scope", text: "Each project begins with requirements, measurements, functional needs and budget clarity." },
+  { title: "Design Control", text: "Layouts, finishes, lighting and material direction are aligned before execution begins." },
+  { title: "Site Discipline", text: "Work is coordinated through practical schedules, site checks and quality-focused handover." },
+];
 
 export const Route = createFileRoute("/company-profile")({
   loader: ({ context }) => context.queryClient.fetchQuery(selectedProjectsQuery),
@@ -87,13 +108,68 @@ function CompanyProfile() {
             </div>
 
             <div className="grid gap-5 md:grid-cols-2">
-              <div className="rounded-2xl border border-border bg-[color:var(--section)] p-7">
+              <div className="overflow-hidden rounded-2xl border border-border bg-[color:var(--section)] shadow-card">
+                <img src={profileImages.vision} alt="Interior material selection and design direction" className="aspect-[16/10] w-full object-cover" />
+                <div className="p-7">
                 <h2 className="font-display text-2xl">Vision</h2>
-                <p className="mt-3 leading-relaxed text-foreground/85">To be a trusted interior design and contracting partner in Sri Lanka, recognized for refined design, reliable execution and spaces that create lasting value for homes, workplaces and commercial environments.</p>
+                  <p className="mt-3 leading-relaxed text-foreground/85">To be a trusted interior design and contracting partner in Sri Lanka, recognized for refined design, reliable execution and spaces that create lasting value for homes, workplaces and commercial environments.</p>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">We aim to shape interiors that feel elegant, purposeful and durable, balancing client lifestyle, brand identity and long-term usability.</p>
+                </div>
               </div>
-              <div className="rounded-2xl border border-border bg-[color:var(--section)] p-7">
+              <div className="overflow-hidden rounded-2xl border border-border bg-[color:var(--section)] shadow-card">
+                <img src={profileImages.mission} alt="Architectural planning and project drawings" className="aspect-[16/10] w-full object-cover" />
+                <div className="p-7">
                 <h2 className="font-display text-2xl">Mission</h2>
-                <p className="mt-3 leading-relaxed text-foreground/85">To deliver complete interior, fit-out and contracting solutions through thoughtful design, accurate planning, quality materials, skilled workmanship and disciplined project management.</p>
+                  <p className="mt-3 leading-relaxed text-foreground/85">To deliver complete interior, fit-out and contracting solutions through thoughtful design, accurate planning, quality materials, skilled workmanship and disciplined project management.</p>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">Our mission is to turn ideas into buildable, well-managed spaces with clear documentation, dependable teams and consistent finishing standards.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-border bg-card p-8 shadow-card">
+              <div className="flex flex-wrap items-start justify-between gap-6">
+                <div className="max-w-xl">
+                  <h2 className="font-display text-2xl">Core Capabilities</h2>
+                  <p className="mt-3 leading-relaxed text-muted-foreground">
+                    DELIFE supports clients from first concept to final handover, combining design thinking with practical site execution.
+                  </p>
+                </div>
+                <div className="inline-flex rounded-full bg-primary/10 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-primary">
+                  Design + Build
+                </div>
+              </div>
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                {companyStrengths.map((item) => (
+                  <div key={item} className="flex items-start gap-3 rounded-xl bg-[color:var(--section)] p-4">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[color:var(--gold)]" />
+                    <span className="text-sm font-medium text-foreground/90">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid gap-5 md:grid-cols-[0.9fr_1.1fr]">
+              <div className="rounded-2xl border border-border bg-[color:var(--section)] p-7">
+                <h2 className="font-display text-2xl">Sectors We Serve</h2>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                  We work across residential, corporate, retail and hospitality environments, adapting each design to the user experience and operational needs of the space.
+                </p>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {sectors.map((sector) => (
+                    <span key={sector} className="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground/80">
+                      {sector}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div className="grid gap-3">
+                {deliveryStandards.map((standard, index) => (
+                  <div key={standard.title} className="rounded-xl border border-border bg-card p-5 shadow-card">
+                    <div className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--gold)]">0{index + 1}</div>
+                    <h3 className="mt-2 font-display text-lg">{standard.title}</h3>
+                    <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{standard.text}</p>
+                  </div>
+                ))}
               </div>
             </div>
 
