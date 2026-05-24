@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Plus, ExternalLink, Trash2, Pencil } from "lucide-react";
@@ -9,6 +9,7 @@ export const Route = createFileRoute("/admin/pages")({ component: AdminPagesInde
 function AdminPagesIndex() {
   const qc = useQueryClient();
   const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const list = useServerFn(adminListPages);
   const save = useServerFn(adminSavePage);
   const del = useServerFn(adminDeletePage);
@@ -21,10 +22,55 @@ function AdminPagesIndex() {
     onSuccess: ({ id }) => navigate({ to: "/admin/pages/$id", params: { id } }),
   });
 
-  const remove = useMutation({
-    mutationFn: async (id: string) => del({ data: { id } }),
+  const createStarterPages = useMutation({
+    mutationFn: async () => {
+      const starterPages = [
+        {
+          title: "About DELIFE Interior",
+          slug: "about-delife-interior",
+          excerpt: "Company overview, values, vision and mission for DELIFE Interior Pvt Ltd.",
+          content_html:
+            "<h2>Complete interior and contracting partner</h2><p>DELIFE Interior Pvt Ltd delivers interior designing, 3D planning, fit-out works, renovations, construction support, commercial interiors, office interiors, customized furniture and project execution across Sri Lanka.</p><h2>Vision</h2><p>To be a trusted interior design and contracting partner recognized for refined design, reliable execution and spaces that create lasting value.</p><h2>Mission</h2><p>To deliver complete interior and contracting solutions through thoughtful design, accurate planning, quality materials, skilled workmanship and disciplined project management.</p>",
+          published: true,
+          display_order: 1,
+        },
+        {
+          title: "Interior Design Services",
+          slug: "interior-design-services",
+          excerpt: "Interior designing, 3D visualization, BOQ, fit-out and renovation services.",
+          content_html:
+            "<h2>Our services</h2><p>We provide interior designing, 3D design and visualization, house planning, concept drawings, BOQ and estimation, interior fit-out works, office interiors, commercial interiors, customized furniture, renovation and contracting, ceiling and partition works, flooring and hospitality interiors.</p>",
+          published: true,
+          display_order: 2,
+        },
+        {
+          title: "Quality and Project Delivery",
+          slug: "quality-project-delivery",
+          excerpt: "How DELIFE manages design, planning, execution, quality control and handover.",
+          content_html:
+            "<h2>Professional delivery process</h2><p>Every project is planned through consultation, space planning, 3D concepts, estimation, execution and final handover. Our team focuses on practical design, clear documentation, quality workmanship and dependable timelines.</p>",
+          published: true,
+          display_order: 3,
+        },
+      ];
+      for (const page of starterPages) {
+        await save({ data: page });
+      }
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "pages"] }),
   });
+
+  const remove = useMutation({
+    mutationFn: async (id: string) => del({ data: { id } }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin", "pages"] });
+      qc.invalidateQueries({ queryKey: ["public-page"] });
+    },
+  });
+
+  if (pathname !== "/admin/pages") {
+    return <Outlet />;
+  }
 
   return (
     <div>
@@ -45,7 +91,16 @@ function AdminPagesIndex() {
       <div className="mt-6 overflow-hidden rounded-xl border border-border bg-card shadow-card">
         {q.isLoading && <p className="p-5 text-sm text-muted-foreground">Loading…</p>}
         {q.data?.length === 0 && (
-          <p className="p-5 text-sm text-muted-foreground">No pages yet. Click "New page" to create one.</p>
+          <div className="flex flex-wrap items-center justify-between gap-3 p-5">
+            <p className="text-sm text-muted-foreground">No pages yet. Create a blank page or add starter CMS pages for the website.</p>
+            <button
+              onClick={() => createStarterPages.mutate()}
+              disabled={createStarterPages.isPending}
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-xs font-semibold hover:border-primary hover:text-primary disabled:opacity-60"
+            >
+              <Plus className="h-3.5 w-3.5" /> {createStarterPages.isPending ? "Creating..." : "Add starter pages"}
+            </button>
+          </div>
         )}
         <ul className="divide-y divide-border">
           {q.data?.map((p) => (

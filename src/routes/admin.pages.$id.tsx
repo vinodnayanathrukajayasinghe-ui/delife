@@ -24,6 +24,7 @@ function AdminPageEdit() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin", "pages"] });
       qc.invalidateQueries({ queryKey: ["admin", "pages", id] });
+      qc.invalidateQueries({ queryKey: ["public-page"] });
     },
   });
 
