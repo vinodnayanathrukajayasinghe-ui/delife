@@ -16,6 +16,11 @@ const featuredProjectsQuery = queryOptions({
 });
 
 const homeImages = {
+  hero: [
+    "https://inxzujmtwxulnawzfelc.supabase.co/storage/v1/object/public/project-media/gallery/1779565596923-a72d6w-45383136_389168851622253_3094791556180213760_n.jpg",
+    "https://inxzujmtwxulnawzfelc.supabase.co/storage/v1/object/public/project-media/gallery/1779565597706-v79n92-45282663_389168768288928_8373255957228027904_n.jpg",
+    "https://inxzujmtwxulnawzfelc.supabase.co/storage/v1/object/public/project-media/gallery/1779565602820-dcf4rf-45249923_389168251622313_6503404269461307392_n.jpg",
+  ],
   about:
     "https://inxzujmtwxulnawzfelc.supabase.co/storage/v1/object/public/project-media/gallery/1779565599846-7ntruc-45396841_389168441622294_4262364315220180992_n.jpg",
   why: [
@@ -76,21 +81,21 @@ function Home() {
             alt="Premium interior living space"
             className="h-full w-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/70 to-background" />
-          <div className="absolute inset-0 bg-grid-soft opacity-30" />
+          <div className="absolute inset-0 bg-gradient-to-br from-background via-background/90 to-background/65" />
+          <div className="absolute inset-0 bg-grid-soft opacity-25" />
         </div>
 
-        <div className="container-px mx-auto grid max-w-7xl gap-12 py-10 md:py-16 lg:grid-cols-12 lg:py-20">
+        <div className="container-px mx-auto grid max-w-7xl gap-12 py-14 md:py-18 lg:grid-cols-12 lg:items-center lg:py-24">
           <div className="lg:col-span-7">
             <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur">
               <Sparkles className="h-3.5 w-3.5 text-[color:var(--gold)]" />
               {brand.primaryLine} · Sri Lanka
             </div>
-            <h1 className="mt-5 font-display text-4xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-[4.2rem]">
+            <h1 className="mt-5 max-w-4xl font-display text-4xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-[4.6rem]">
               Elegant Interior <span className="text-gradient-gold">Designing</span> <br className="hidden sm:block" />
               & Contracting Solutions
             </h1>
-            <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+            <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
               {brand.name} delivers professional interior design, 3D planning, fit-out, renovation and contracting solutions for residential, commercial and corporate projects.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -105,15 +110,15 @@ function Home() {
               </a>
             </div>
 
-            <div className="mt-12 grid max-w-lg grid-cols-3 gap-6">
+            <div className="mt-10 grid max-w-2xl gap-3 sm:grid-cols-3">
               {[
                 ["100+", "Projects Delivered"],
                 ["15+", "Years of Expertise"],
-                ["100%", "Quality Guaranteed"],
+                ["360", "Design to Handover"],
               ].map(([k, v]) => (
-                <div key={k}>
+                <div key={k} className="rounded-xl border border-border bg-card/90 p-4 shadow-card backdrop-blur">
                   <div className="font-display text-3xl text-primary">{k}</div>
-                  <div className="text-xs uppercase tracking-wider text-muted-foreground">{v}</div>
+                  <div className="mt-1 text-xs uppercase tracking-wider text-muted-foreground">{v}</div>
                 </div>
               ))}
             </div>
@@ -121,11 +126,11 @@ function Home() {
 
           <div className="relative lg:col-span-5">
             <div className="relative ml-auto aspect-[4/5] w-full max-w-md overflow-hidden rounded-2xl shadow-elegant">
-              <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80" alt="Modern residence by DELIFE" className="h-full w-full object-cover" />
+              <img src={homeImages.hero[0]} alt="Completed DELIFE interior ceiling and lighting work" className="h-full w-full object-cover" />
             </div>
             <div className="absolute -bottom-6 -left-4 hidden w-56 rounded-xl border border-border bg-card/95 p-4 shadow-card backdrop-blur md:block">
-              <div className="text-xs uppercase tracking-wider text-muted-foreground">Now Building</div>
-              <div className="mt-1 font-display text-lg leading-tight">Modern House Design</div>
+              <div className="text-xs uppercase tracking-wider text-muted-foreground">DELIFE Delivery</div>
+              <div className="mt-1 font-display text-lg leading-tight">Design, fit-out and finishing by one team</div>
               <div className="mt-1 text-xs text-muted-foreground">Western Province · 2024</div>
             </div>
           </div>
