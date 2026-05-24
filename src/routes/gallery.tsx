@@ -4,6 +4,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { brand, galleryCategories, galleryItems } from "@/lib/site";
 import { CmsPageSection } from "@/components/CmsPageSection";
+import { breadcrumbSchema, jsonLd, seoMeta } from "@/lib/seo";
 
 const galleryQuery = queryOptions({
   queryKey: ["gallery-images"],
@@ -22,13 +23,13 @@ const galleryQuery = queryOptions({
 export const Route = createFileRoute("/gallery")({
   loader: ({ context }) => context.queryClient.fetchQuery(galleryQuery),
   head: () => ({
-    meta: [
-      { title: `Gallery | ${brand.name}` },
-      { name: "description", content: "Visual gallery of interiors, construction, office, residential, commercial, 3D designs, furniture and renovations by DELIFE Interior Pvt Ltd." },
-      { property: "og:title", content: `Gallery | ${brand.name}` },
-      { property: "og:description", content: "DELIFE Interior project gallery." },
-    ],
-    links: [{ rel: "canonical", href: "/gallery" }],
+    ...seoMeta({
+      title: "Gallery | DELIFE Interior Designing and Contracting",
+      description:
+        "Browse the project gallery of DELIFE Interior Designing and Contracting featuring interior design, construction, office interiors, residential interiors, commercial spaces, 3D designs and renovation works.",
+      canonical: "/gallery",
+    }),
+    scripts: [jsonLd(breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Gallery", path: "/gallery" }]))],
   }),
   component: GalleryPage,
 });
@@ -49,7 +50,7 @@ function GalleryPage() {
           <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-[color:var(--gold)]">
             <span className="h-px w-8 bg-[color:var(--gold)]" />Gallery<span className="h-px w-8 bg-[color:var(--gold)]" />
           </div>
-          <h1 className="mt-3 font-display text-4xl sm:text-5xl">Project Visuals</h1>
+          <h1 className="mt-3 font-display text-4xl sm:text-5xl">Interior Design & Contracting Gallery</h1>
           <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground sm:text-lg">Curated photography from interiors, construction, fit-out, furniture and 3D design projects.</p>
         </div>
 
@@ -65,9 +66,10 @@ function GalleryPage() {
           {items.map((item: any, i) => {
             const src = item.url ?? item.src;
             const caption = item.caption ?? item.cat;
+            const altText = item.alt_text ?? `${brand.name} ${caption ?? "interior design project gallery"} Sri Lanka`;
             return (
               <figure key={item.id ?? `${src}-${i}`} className="group overflow-hidden rounded-xl border border-border bg-card shadow-card">
-                <img src={src} alt={caption ?? "Gallery image"} className="aspect-[4/3] w-full object-cover transition duration-500 group-hover:scale-105" />
+                <img src={src} alt={altText} className="aspect-[4/3] w-full object-cover transition duration-500 group-hover:scale-105" />
                 {caption && <figcaption className="px-4 py-3 text-sm font-semibold">{caption}</figcaption>}
               </figure>
             );

@@ -2,3 +2,5 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /admin-login
+
+Sitemap: http://www.delifeinterior.com/sitemap.xml

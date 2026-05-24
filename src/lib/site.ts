@@ -2,7 +2,7 @@ import logoFull from "@/assets/delife-logo-full.png";
 import logoIcon from "@/assets/delife-logo-icon.png";
 
 export const brand = {
-  name: "DELIFE Interior Pvt Ltd",
+  name: "DELIFE Interior Designing and Contracting",
   short: "DELIFE",
   tagline: "Crafting Elegant Spaces with Precision",
   primaryLine: "Interior Designing and Contracting",
@@ -289,7 +289,7 @@ export const whyChooseUs = [
   { title: "Reliable Project Execution", desc: "Disciplined site management with experienced, in-house teams." },
   { title: "Quality Finishing", desc: "Meticulous detailing and premium materials in every handover." },
   { title: "Professional Planning", desc: "Clear drawings, accurate BOQs and transparent scheduling." },
-  { title: "On-Time Delivery", desc: "Milestone-driven delivery you can plan your business around." },
+  { title: "Reliable Handover", desc: "Completed spaces checked, coordinated and ready for confident use." },
   { title: "Full-Spectrum Expertise", desc: "Residential, commercial, corporate & hospitality experience." },
 ];
 

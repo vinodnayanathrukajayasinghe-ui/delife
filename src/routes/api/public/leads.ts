@@ -24,7 +24,7 @@ async function sendNotificationEmail(lead: {
   page_url?: string | null;
 }) {
   try {
-    // Try to send via Lovable Emails if available; silently no-op otherwise.
+    // Try to send email notifications if a provider is configured; silently no-op otherwise.
     const { data: settings } = await supabaseAdmin
       .from("site_settings")
       .select("notification_email")
@@ -32,10 +32,9 @@ async function sendNotificationEmail(lead: {
       .maybeSingle();
     const to = settings?.notification_email;
     if (!to) return;
-    const LOVABLE_API_KEY = process.env.LOVABLE_API_KEY;
-    if (!LOVABLE_API_KEY) return;
-    // Attempt email via Lovable AI Gateway email endpoint if configured; otherwise skip.
-    // The proper flow uses scaffolded transactional emails; this is a best-effort fallback.
+    const EMAIL_API_KEY = process.env.EMAIL_API_KEY;
+    if (!EMAIL_API_KEY) return;
+    // Provider integration can be added here without changing the public contact form flow.
   } catch (e) {
     console.error("notification email error", e);
   }

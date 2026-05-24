@@ -3,6 +3,7 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowLeft, Calendar, Briefcase, CheckCircle2, MapPin, MessageCircle } from "lucide-react";
 import { getPublicProjectBySlug } from "@/lib/projects.functions";
 import { brand, waLink } from "@/lib/site";
+import { absoluteUrl, breadcrumbSchema, jsonLd, seoMeta } from "@/lib/seo";
 import {
   projectCompletion,
   projectCover,
@@ -27,18 +28,28 @@ export const Route = createFileRoute("/projects/$slug")({
   head: ({ loaderData }) => {
     const p = loaderData?.project;
     const cover = p ? projectCover(p) : "";
-    const title = `${p ? projectTitle(p) : "Project"} | ${brand.name}`;
-    const description = p ? projectSummary(p) : "";
+    const title = p?.seo_title || `${p ? projectTitle(p) : "Project"} | ${brand.name}`;
+    const description =
+      p?.meta_description ||
+      (p ? `${projectSummary(p)} Interior designing and contracting project by ${brand.name} in Sri Lanka.` : "");
     return {
-      meta: [
-        { title },
-        { name: "description", content: description },
-        { property: "og:title", content: title },
-        { property: "og:description", content: description },
-        { property: "og:type", content: "article" },
-        ...(cover ? [{ property: "og:image", content: cover }, { name: "twitter:image", content: cover }] : []),
-      ],
-      links: p ? [{ rel: "canonical", href: `/projects/${p.slug}` }] : [],
+      ...seoMeta({ title, description, canonical: p ? `/projects/${p.slug}` : "/projects", image: cover, type: "article" }),
+      scripts: p
+        ? [
+            jsonLd(breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Projects", path: "/projects" }, { name: projectTitle(p), path: `/projects/${p.slug}` }])),
+            jsonLd({
+              "@context": "https://schema.org",
+              "@type": "CreativeWork",
+              name: projectTitle(p),
+              description,
+              image: cover ? absoluteUrl(cover) : undefined,
+              url: absoluteUrl(`/projects/${p.slug}`),
+              creator: { "@type": "Organization", name: brand.name },
+              about: p.category || "Interior Designing and Contracting Project",
+              locationCreated: p.location || "Sri Lanka",
+            }),
+          ]
+        : [],
     };
   },
   component: ProjectDetail,
@@ -59,7 +70,7 @@ function ProjectDetail() {
     <>
       <section className="relative isolate overflow-hidden border-b border-border">
         <div className="absolute inset-0 -z-10">
-          <img src={cover} alt="" className="h-full w-full object-cover" />
+          <img src={cover} alt={`${brand.name} ${projectTitle(p)} project Sri Lanka`} className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/85 to-background/30" />
         </div>
         <div className="container-px mx-auto max-w-7xl py-24">
@@ -82,9 +93,12 @@ function ProjectDetail() {
 
             <h3 className="mt-10 font-display text-xl">Project Gallery</h3>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              {gallery.map((url, i) => (
-                <img key={`${url}-${i}`} src={url} alt={`${projectTitle(p)} ${i + 1}`} className="aspect-[4/3] w-full rounded-xl object-cover shadow-card" />
-              ))}
+              {gallery.map((url, i) => {
+                const image = data.images.find((item) => item.url === url);
+                return (
+                  <img key={`${url}-${i}`} src={url} alt={image?.alt_text || `${brand.name} ${projectTitle(p)} interior design project image ${i + 1} Sri Lanka`} className="aspect-[4/3] w-full rounded-xl object-cover shadow-card" />
+                );
+              })}
             </div>
 
             {(before.length > 0 || after.length > 0) && (
@@ -93,13 +107,13 @@ function ProjectDetail() {
                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   {before.map((image) => (
                     <figure key={image.id}>
-                      <img src={image.url} alt={`${projectTitle(p)} before`} className="aspect-[4/3] w-full rounded-xl object-cover shadow-card" />
+                      <img src={image.url} alt={image.alt_text || `${brand.name} ${projectTitle(p)} before renovation Sri Lanka`} className="aspect-[4/3] w-full rounded-xl object-cover shadow-card" />
                       <figcaption className="mt-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Before</figcaption>
                     </figure>
                   ))}
                   {after.map((image) => (
                     <figure key={image.id}>
-                      <img src={image.url} alt={`${projectTitle(p)} after`} className="aspect-[4/3] w-full rounded-xl object-cover shadow-card" />
+                      <img src={image.url} alt={image.alt_text || `${brand.name} ${projectTitle(p)} after interior fit-out Sri Lanka`} className="aspect-[4/3] w-full rounded-xl object-cover shadow-card" />
                       <figcaption className="mt-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">After</figcaption>
                     </figure>
                   ))}

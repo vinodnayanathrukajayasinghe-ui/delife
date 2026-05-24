@@ -156,7 +156,11 @@ const pageInput = z.object({
   content_html: z.string().max(200000).default(""),
   meta_title: z.string().max(200).optional().nullable(),
   meta_description: z.string().max(400).optional().nullable(),
+  meta_keywords: z.string().max(1000).optional().nullable(),
+  og_title: z.string().max(200).optional().nullable(),
+  og_description: z.string().max(400).optional().nullable(),
   og_image_url: z.string().url().max(2000).optional().nullable().or(z.literal("")),
+  canonical_url: z.string().max(2000).optional().nullable(),
   published: z.boolean().default(false),
   display_order: z.number().int().default(0),
 });

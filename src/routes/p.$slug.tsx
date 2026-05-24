@@ -2,6 +2,7 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { getPublicPageBySlug } from "@/lib/pages.functions";
 import { brand } from "@/lib/site";
+import { absoluteUrl } from "@/lib/seo";
 
 const pageQuery = (slug: string) =>
   queryOptions({
@@ -17,21 +18,23 @@ export const Route = createFileRoute("/p/$slug")({
   },
   head: ({ loaderData }) => {
     if (!loaderData) return { meta: [] };
-    const title = loaderData.meta_title || `${loaderData.title} · ${brand.name}`;
+    const title = loaderData.meta_title || `${loaderData.title} | ${brand.name}`;
     const description = loaderData.meta_description || loaderData.excerpt || "";
     const meta: Array<Record<string, string>> = [
       { title },
-      { property: "og:title", content: title },
+      { property: "og:title", content: loaderData.og_title || title },
+      { property: "og:site_name", content: brand.name },
     ];
+    if (loaderData.meta_keywords) meta.push({ name: "keywords", content: loaderData.meta_keywords });
     if (description) {
       meta.push({ name: "description", content: description });
-      meta.push({ property: "og:description", content: description });
+      meta.push({ property: "og:description", content: loaderData.og_description || description });
     }
     if (loaderData.og_image_url) {
       meta.push({ property: "og:image", content: loaderData.og_image_url });
       meta.push({ name: "twitter:image", content: loaderData.og_image_url });
     }
-    return { meta };
+    return { meta, links: [{ rel: "canonical", href: loaderData.canonical_url || absoluteUrl(`/p/${loaderData.slug}`) }] };
   },
   component: PublicPage,
   notFoundComponent: () => (

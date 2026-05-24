@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { listPublicProjects } from "@/lib/projects.functions";
 import { brand } from "@/lib/site";
 import { CmsPageSection } from "@/components/CmsPageSection";
+import { breadcrumbSchema, jsonLd, seoMeta } from "@/lib/seo";
 import {
   projectCategories,
   projectCompletion,
@@ -22,13 +23,13 @@ const projectsQuery = queryOptions({
 export const Route = createFileRoute("/projects")({
   loader: ({ context }) => context.queryClient.fetchQuery(projectsQuery),
   head: () => ({
-    meta: [
-      { title: `Projects | ${brand.name}` },
-      { name: "description", content: "Selected interior, fit-out, commercial, corporate, hospitality and construction projects by DELIFE Interior Pvt Ltd in Sri Lanka." },
-      { property: "og:title", content: `Projects | ${brand.name}` },
-      { property: "og:description", content: "Featured DELIFE Interior project portfolio." },
-    ],
-    links: [{ rel: "canonical", href: "/projects" }],
+    ...seoMeta({
+      title: "Projects | DELIFE Interior Designing and Contracting Sri Lanka",
+      description:
+        "View project portfolio by DELIFE Interior Designing and Contracting, including residential interiors, commercial interiors, corporate projects, hospitality interiors, fit-out works and construction projects in Sri Lanka.",
+      canonical: "/projects",
+    }),
+    scripts: [jsonLd(breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Projects", path: "/projects" }]))],
   }),
   component: ProjectsPage,
 });
@@ -51,7 +52,7 @@ function ProjectsPage() {
           <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.25em] text-[color:var(--gold)]">
             <span className="h-px w-8 bg-[color:var(--gold)]" />Portfolio<span className="h-px w-8 bg-[color:var(--gold)]" />
           </div>
-          <h1 className="mt-4 font-display text-4xl text-foreground sm:text-5xl md:text-6xl">Our Projects</h1>
+          <h1 className="mt-4 font-display text-4xl text-foreground sm:text-5xl md:text-6xl">Our Interior Designing & Contracting Projects</h1>
           <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground sm:text-lg">A selection of completed and ongoing work across residential, commercial, corporate and hospitality sectors.</p>
         </div>
       </section>
@@ -77,7 +78,7 @@ function ProjectsPage() {
           {filtered.map((p) => (
             <Link key={p.id} to="/projects/$slug" params={{ slug: p.slug }} className="group overflow-hidden rounded-xl border border-border bg-card shadow-card transition hover:-translate-y-1 hover:shadow-elegant">
               <div className="relative aspect-[4/3] overflow-hidden">
-                <img src={projectCover(p)} alt={projectTitle(p)} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+                <img src={projectCover(p)} alt={`${brand.name} ${projectTitle(p)} project Sri Lanka`} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
                 <span className={`absolute right-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${p.status === "completed" ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
                   {projectStatusLabel(p)}
                 </span>

@@ -8,7 +8,7 @@ export function Footer() {
       <div className="container-px mx-auto max-w-7xl py-14">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div>
-            <img src={brand.logoFull} alt={brand.name} className="h-24 w-auto object-contain" />
+            <img src={brand.logoFull} alt={`${brand.name} logo`} className="h-24 w-auto object-contain" />
             <p className="mt-4 max-w-sm text-sm text-muted-foreground">
               {brand.name} delivers elegant interior designing, fit-out, 3D planning and contracting solutions across Sri Lanka.
             </p>

@@ -3,6 +3,7 @@ import { ArrowRight, Award, CheckCircle2, Eye, Target } from "lucide-react";
 import { brand, whyChooseUs } from "@/lib/site";
 import { SectionHeading } from "@/components/SectionHeading";
 import { CmsPageSection } from "@/components/CmsPageSection";
+import { breadcrumbSchema, jsonLd, seoMeta } from "@/lib/seo";
 
 const aboutImages = {
   hero:
@@ -23,13 +24,14 @@ const aboutImages = {
 
 export const Route = createFileRoute("/about-us")({
   head: () => ({
-    meta: [
-      { title: `About Us | ${brand.name}` },
-      { name: "description", content: "Learn about DELIFE Interior Pvt Ltd, our vision, mission, core values and full-spectrum interior design and contracting expertise in Sri Lanka." },
-      { property: "og:title", content: `About Us | ${brand.name}` },
-      { property: "og:description", content: "Vision, mission and values behind DELIFE Interior Pvt Ltd." },
-    ],
-    links: [{ rel: "canonical", href: "/about-us" }],
+    ...seoMeta({
+      title: "About DELIFE Interior Designing and Contracting | Sri Lanka",
+      description:
+        "Learn about DELIFE Interior Designing and Contracting, a professional interior designing and contracting company in Sri Lanka focused on creative design, quality workmanship and reliable project execution.",
+      canonical: "/about-us",
+      image: aboutImages.hero,
+    }),
+    scripts: [jsonLd(breadcrumbSchema([{ name: "Home", path: "/" }, { name: "About", path: "/about-us" }]))],
   }),
   component: About,
 });
@@ -45,10 +47,10 @@ function About() {
               <span className="h-px w-8 bg-[color:var(--gold)]" />About DELIFE
             </div>
             <h1 className="mt-4 font-display text-4xl leading-tight text-foreground sm:text-5xl md:text-6xl">
-              Interior design and contracting, delivered with discipline.
+              About DELIFE Interior Designing and Contracting
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              DELIFE Interior Pvt Ltd is a Sri Lanka-based interior designing and contracting company focused on refined spaces, practical planning, skilled workmanship and dependable project delivery.
+              DELIFE Interior Designing and Contracting is a Sri Lanka-based interior designing and contracting company focused on refined spaces, practical planning, skilled workmanship and dependable project delivery.
             </p>
             <div className="mt-8 grid gap-3 sm:grid-cols-3">
               {[
@@ -65,7 +67,7 @@ function About() {
           </div>
           <div className="lg:col-span-6">
             <div className="overflow-hidden rounded-2xl shadow-elegant">
-              <img src={aboutImages.hero} alt="Professional interior design studio and refined residential space" className="aspect-[16/11] w-full object-cover" />
+              <img src={aboutImages.hero} alt="DELIFE Interior Designing and Contracting professional interior design company Sri Lanka" className="aspect-[16/11] w-full object-cover" />
             </div>
           </div>
         </div>
@@ -74,9 +76,9 @@ function About() {
       <section className="container-px mx-auto max-w-7xl py-20">
         <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
           <div className="grid gap-4 sm:grid-cols-5">
-            <img src={aboutImages.studio} alt="Elegant completed interior design" className="aspect-[4/3] w-full rounded-2xl object-cover shadow-card sm:col-span-5" />
-            <img src={aboutImages.planning} alt="Architectural planning and interior drawings" className="aspect-[4/3] w-full rounded-xl object-cover shadow-card sm:col-span-2" />
-            <img src={aboutImages.execution} alt="Interior fit-out execution on site" className="aspect-[4/3] w-full rounded-xl object-cover shadow-card sm:col-span-3" />
+            <img src={aboutImages.studio} alt="DELIFE Interior Designing and Contracting residential house interior design Sri Lanka" className="aspect-[4/3] w-full rounded-2xl object-cover shadow-card sm:col-span-5" />
+            <img src={aboutImages.planning} alt="DELIFE Interior Designing and Contracting house planning and BOQ estimation Sri Lanka" className="aspect-[4/3] w-full rounded-xl object-cover shadow-card sm:col-span-2" />
+            <img src={aboutImages.execution} alt="DELIFE Interior Designing and Contracting interior fit-out Sri Lanka" className="aspect-[4/3] w-full rounded-xl object-cover shadow-card sm:col-span-3" />
           </div>
           <div>
             <SectionHeading eyebrow="Who we are" title="A complete interior and contracting partner" subtitle="We combine creative interior concepts with practical site execution, so clients can move from idea to handover through one coordinated team." />
@@ -111,7 +113,7 @@ function About() {
             },
           ].map(({ icon: Icon, title, image, text }) => (
             <article key={title} className="overflow-hidden rounded-2xl border border-border bg-card shadow-card">
-              <img src={image} alt={`${title} of DELIFE Interior`} className="aspect-[16/9] w-full object-cover" />
+              <img src={image} alt={`${brand.name} ${title.toLowerCase()} interior design Sri Lanka`} className="aspect-[16/9] w-full object-cover" />
               <div className="p-8">
                 <div className="inline-grid h-12 w-12 place-items-center rounded-lg bg-primary/10 text-primary">
                   <Icon className="h-5 w-5" />

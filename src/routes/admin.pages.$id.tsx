@@ -150,10 +150,44 @@ function AdminPageEdit() {
               />
             </label>
             <label className="mt-3 block">
+              <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Meta keywords</div>
+              <textarea
+                value={form.meta_keywords ?? ""}
+                onChange={(e) => set("meta_keywords", e.target.value)}
+                rows={3}
+                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+            </label>
+            <label className="mt-3 block">
+              <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">OG title</div>
+              <input
+                value={form.og_title ?? ""}
+                onChange={(e) => set("og_title", e.target.value)}
+                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+            </label>
+            <label className="mt-3 block">
+              <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">OG description</div>
+              <textarea
+                value={form.og_description ?? ""}
+                onChange={(e) => set("og_description", e.target.value)}
+                rows={3}
+                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+            </label>
+            <label className="mt-3 block">
               <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">OG image URL</div>
               <input
                 value={form.og_image_url ?? ""}
                 onChange={(e) => set("og_image_url", e.target.value)}
+                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+            </label>
+            <label className="mt-3 block">
+              <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Canonical URL</div>
+              <input
+                value={form.canonical_url ?? ""}
+                onChange={(e) => set("canonical_url", e.target.value)}
                 className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:border-primary"
               />
             </label>

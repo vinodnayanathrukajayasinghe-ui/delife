@@ -59,6 +59,17 @@ function ProjectEditor() {
     },
   });
 
+  const updateImageAlt = useMutation({
+    mutationFn: async ({ imgId, altText }: { imgId: string; altText: string }) => {
+      const { error } = await supabase.from("project_images").update({ alt_text: altText || null, caption: altText || null }).eq("id", imgId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin", "project", id] });
+      qc.invalidateQueries({ queryKey: ["public-project"] });
+    },
+  });
+
   async function uploadFile(file: File, kind: "cover" | "gallery" | "before" | "after", pairId?: string) {
     const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
     const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safe}`;
@@ -131,6 +142,17 @@ function ProjectEditor() {
           <Field label="Full description">
             <textarea rows={6} value={form.description ?? ""} onChange={(e) => setForm({ ...form, description: e.target.value })} className="input" />
           </Field>
+          <div className="rounded-xl border border-border bg-card p-4 shadow-card">
+            <h2 className="font-display text-sm uppercase tracking-wider text-muted-foreground">Project SEO</h2>
+            <div className="mt-3 space-y-4">
+              <Field label="Project SEO title">
+                <input value={form.seo_title ?? ""} onChange={(e) => setForm({ ...form, seo_title: e.target.value })} className="input" />
+              </Field>
+              <Field label="Project meta description">
+                <textarea rows={3} value={form.meta_description ?? ""} onChange={(e) => setForm({ ...form, meta_description: e.target.value })} className="input" />
+              </Field>
+            </div>
+          </div>
         </div>
 
         <div className="space-y-4">
@@ -167,12 +189,13 @@ function ProjectEditor() {
         </div>
       </div>
 
-      <ImageSection title="Gallery" images={gallery} onUpload={(files) => uploadFiles(files, "gallery")} onDelete={(i) => removeImage.mutate(i)} />
+      <ImageSection title="Gallery" images={gallery} onUpload={(files) => uploadFiles(files, "gallery")} onDelete={(i) => removeImage.mutate(i)} onAltChange={(imgId, altText) => updateImageAlt.mutate({ imgId, altText })} />
       <BeforeAfterSection
         before={beforeImgs}
         after={afterImgs}
         onUpload={(files, kind) => uploadFiles(files, kind)}
         onDelete={(i) => removeImage.mutate(i)}
+        onAltChange={(imgId, altText) => updateImageAlt.mutate({ imgId, altText })}
       />
 
       <style>{`.input{ width:100%; border:1px solid var(--input); background:var(--background); border-radius:.5rem; padding:.65rem .75rem; font-size:.875rem; outline:none; } .input:focus{ border-color: var(--primary); }`}</style>
@@ -210,7 +233,7 @@ function FileButton({ label, multiple = false, onFiles }: { label: string; multi
   );
 }
 
-function ImageSection({ title, images, onUpload, onDelete }: { title: string; images: any[]; onUpload: (files: File[]) => Promise<void>; onDelete: (id: string) => void; }) {
+function ImageSection({ title, images, onUpload, onDelete, onAltChange }: { title: string; images: any[]; onUpload: (files: File[]) => Promise<void>; onDelete: (id: string) => void; onAltChange: (id: string, altText: string) => void; }) {
   return (
     <div className="rounded-xl border border-border bg-card p-5 shadow-card">
       <div className="flex items-center justify-between">
@@ -224,6 +247,12 @@ function ImageSection({ title, images, onUpload, onDelete }: { title: string; im
           {images.map((img) => (
             <div key={img.id} className="group relative overflow-hidden rounded-lg border border-border">
               <img src={img.url} alt="" className="aspect-square w-full object-cover" />
+              <input
+                defaultValue={img.alt_text ?? img.caption ?? ""}
+                onBlur={(e) => onAltChange(img.id, e.target.value)}
+                placeholder="Image alt text"
+                className="w-full border-t border-border bg-background px-2 py-1.5 text-xs outline-none focus:border-primary"
+              />
               <button onClick={() => onDelete(img.id)} className="absolute right-1.5 top-1.5 grid h-7 w-7 place-items-center rounded-full bg-background/90 text-destructive opacity-0 transition group-hover:opacity-100">
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
@@ -235,7 +264,7 @@ function ImageSection({ title, images, onUpload, onDelete }: { title: string; im
   );
 }
 
-function BeforeAfterSection({ before, after, onUpload, onDelete }: { before: any[]; after: any[]; onUpload: (files: File[], kind: "before" | "after") => Promise<void>; onDelete: (id: string) => void; }) {
+function BeforeAfterSection({ before, after, onUpload, onDelete, onAltChange }: { before: any[]; after: any[]; onUpload: (files: File[], kind: "before" | "after") => Promise<void>; onDelete: (id: string) => void; onAltChange: (id: string, altText: string) => void; }) {
   // Group by pair_id; orphans displayed under "Unpaired"
   return (
     <div className="rounded-xl border border-border bg-card p-5 shadow-card">
@@ -247,15 +276,15 @@ function BeforeAfterSection({ before, after, onUpload, onDelete }: { before: any
         </div>
       </div>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
-        <Column title="Before" images={before} onDelete={onDelete} />
-        <Column title="After" images={after} onDelete={onDelete} />
+        <Column title="Before" images={before} onDelete={onDelete} onAltChange={onAltChange} />
+        <Column title="After" images={after} onDelete={onDelete} onAltChange={onAltChange} />
       </div>
       <p className="mt-3 text-xs text-muted-foreground">Tip: to pair a before and after, upload one of each — they'll appear side by side here.</p>
     </div>
   );
 }
 
-function Column({ title, images, onDelete }: { title: string; images: any[]; onDelete: (id: string) => void }) {
+function Column({ title, images, onDelete, onAltChange }: { title: string; images: any[]; onDelete: (id: string) => void; onAltChange: (id: string, altText: string) => void }) {
   return (
     <div>
       <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{title}</div>
@@ -266,6 +295,12 @@ function Column({ title, images, onDelete }: { title: string; images: any[]; onD
           {images.map((img) => (
             <div key={img.id} className="group relative overflow-hidden rounded-lg border border-border">
               <img src={img.url} alt="" className="aspect-square w-full object-cover" />
+              <input
+                defaultValue={img.alt_text ?? img.caption ?? ""}
+                onBlur={(e) => onAltChange(img.id, e.target.value)}
+                placeholder="Image alt text"
+                className="w-full border-t border-border bg-background px-2 py-1.5 text-xs outline-none focus:border-primary"
+              />
               <button onClick={() => onDelete(img.id)} className="absolute right-1.5 top-1.5 grid h-7 w-7 place-items-center rounded-full bg-background/90 text-destructive opacity-0 transition group-hover:opacity-100">
                 <Trash2 className="h-3.5 w-3.5" />
               </button>

@@ -7,6 +7,7 @@ import { projectCover, projectTitle } from "@/lib/project-view";
 import { brand, contact, processSteps, services, testimonials, waLink, whyChooseUs } from "@/lib/site";
 import { SectionHeading } from "@/components/SectionHeading";
 import { CmsPageSection } from "@/components/CmsPageSection";
+import { breadcrumbSchema, jsonLd, seoMeta } from "@/lib/seo";
 
 const featuredProjectsQuery = queryOptions({
   queryKey: ["public-projects", "featured"],
@@ -62,13 +63,14 @@ const homeImages = {
 export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.fetchQuery(featuredProjectsQuery),
   head: () => ({
-    meta: [
-      { title: `${brand.name} | Elegant Interior Designing & Contracting` },
-      { name: "description", content: "DELIFE Interior Pvt Ltd delivers premium interior design, 3D planning, fit-out, renovation and contracting solutions across Sri Lanka." },
-      { property: "og:title", content: `${brand.name} | Elegant Interior Designing & Contracting` },
-      { property: "og:description", content: brand.altPositioning },
-    ],
-    links: [{ rel: "canonical", href: "/" }],
+    ...seoMeta({
+      title: "DELIFE Interior Designing and Contracting | Interior Design Sri Lanka",
+      description:
+        "DELIFE Interior Designing and Contracting offers professional interior designing, 3D visualization, fit-out, renovation and contracting services for homes, offices and commercial spaces in Sri Lanka.",
+      canonical: "/",
+      image: homeImages.hero[0],
+    }),
+    scripts: [jsonLd(breadcrumbSchema([{ name: "Home", path: "/" }]))],
   }),
   component: Home,
 });
@@ -89,7 +91,7 @@ function HeroCarousel() {
         <img
           key={src}
           src={src}
-          alt="Completed DELIFE interior project gallery"
+          alt="DELIFE Interior Designing and Contracting completed interior project gallery Sri Lanka"
           className={`absolute inset-0 h-full w-full object-cover transition duration-1000 ${
             index === active ? "scale-100 opacity-100" : "scale-105 opacity-0"
           }`}
@@ -120,7 +122,7 @@ function Home() {
         <div className="absolute inset-0 -z-10">
           <img
             src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=2000&q=80"
-            alt="Premium interior living space"
+            alt="DELIFE Interior Designing and Contracting residential house interior design Sri Lanka"
             className="h-full w-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-br from-background via-background/90 to-background/65" />
@@ -138,7 +140,7 @@ function Home() {
               & Contracting Solutions
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              {brand.name} delivers professional interior design, 3D planning, fit-out, renovation and contracting solutions for residential, commercial and corporate projects.
+              DELIFE Interior Designing and Contracting is a professional interior design and contracting company in Sri Lanka, delivering creative, functional and high-quality spaces for residential, commercial and corporate clients.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link to="/projects" className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-elegant transition hover:opacity-95">
@@ -181,8 +183,8 @@ function Home() {
       <section className="container-px mx-auto max-w-7xl py-20">
         <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
           <div className="relative">
-            <img src={homeImages.about} alt="Completed premium interior living space" className="aspect-[5/4] w-full rounded-2xl object-cover shadow-card" />
-            <img src={brand.logoIcon} alt="" className="absolute -bottom-8 -right-6 hidden h-32 w-32 rounded-full bg-card p-3 shadow-elegant ring-1 ring-border md:block" />
+            <img src={homeImages.about} alt="DELIFE Interior Designing and Contracting commercial fit-out project" className="aspect-[5/4] w-full rounded-2xl object-cover shadow-card" />
+            <img src={brand.logoIcon} alt={`${brand.name} logo`} className="absolute -bottom-8 -right-6 hidden h-32 w-32 rounded-full bg-card p-3 shadow-elegant ring-1 ring-border md:block" />
           </div>
           <div>
             <SectionHeading eyebrow="About DELIFE" title="Crafting elegant spaces, with precision." subtitle="We are a Sri Lanka–based interior designing and contracting company delivering complete design, fit-out and construction support across residential, commercial, corporate and hospitality projects." />
@@ -208,7 +210,7 @@ function Home() {
             {whyChooseUs.map((w, i) => (
               <div key={w.title} className="group overflow-hidden rounded-xl border border-border bg-card shadow-card transition hover:-translate-y-1 hover:shadow-elegant">
                 <div className="aspect-[16/9] overflow-hidden">
-                  <img src={homeImages.why[i]} alt={w.title} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+                  <img src={homeImages.why[i]} alt={`${brand.name} ${w.title.toLowerCase()} Sri Lanka`} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
                 </div>
                 <div className="p-6">
                   <div className="font-display text-sm text-[color:var(--gold)]">0{i + 1}</div>
@@ -231,7 +233,7 @@ function Home() {
           {services.slice(0, 6).map((s) => (
             <Link key={s.slug} to="/services" className="group overflow-hidden rounded-xl border border-border bg-card shadow-card transition hover:-translate-y-1 hover:shadow-elegant">
               <div className="aspect-[16/9] overflow-hidden">
-                <img src={homeImages.services[s.slug]} alt={s.title} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+                <img src={homeImages.services[s.slug]} alt={`${brand.name} ${s.title} Sri Lanka`} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
               </div>
               <div className="p-6">
                 <h3 className="font-display text-xl">{s.title}</h3>
@@ -254,7 +256,7 @@ function Home() {
             {featured.map((p) => (
               <Link key={p.id} to="/projects/$slug" params={{ slug: p.slug }} className="group overflow-hidden rounded-xl border border-border bg-card shadow-card transition hover:-translate-y-1 hover:shadow-elegant">
                 <div className="aspect-[4/3] overflow-hidden">
-                  <img src={projectCover(p)} alt={projectTitle(p)} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+                  <img src={projectCover(p)} alt={`${brand.name} ${projectTitle(p)} project Sri Lanka`} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
                 </div>
                 <div className="p-5">
                   {p.category && <div className="text-xs font-semibold uppercase tracking-wider text-[color:var(--gold)]">{p.category}</div>}
@@ -273,7 +275,7 @@ function Home() {
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
           {processSteps.map((s, i) => (
             <div key={s.n} className="overflow-hidden rounded-xl border border-border bg-card text-center shadow-card">
-              <img src={homeImages.process[i]} alt={s.title} className="aspect-[4/3] w-full object-cover" />
+              <img src={homeImages.process[i]} alt={`${brand.name} ${s.title.toLowerCase()} process Sri Lanka`} className="aspect-[4/3] w-full object-cover" />
               <div className="p-5">
                 <div className="font-display text-2xl text-[color:var(--gold)]">{s.n}</div>
                 <div className="mt-1 font-display text-lg">{s.title}</div>

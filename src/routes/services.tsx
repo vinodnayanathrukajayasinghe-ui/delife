@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { MessageCircle } from "lucide-react";
 import { brand, services, waLink } from "@/lib/site";
 import { CmsPageSection } from "@/components/CmsPageSection";
+import { breadcrumbSchema, jsonLd, seoMeta, serviceSchema } from "@/lib/seo";
 
 const serviceImages: Record<string, string> = {
   "interior-designing":
@@ -36,13 +37,16 @@ const serviceImages: Record<string, string> = {
 
 export const Route = createFileRoute("/services")({
   head: () => ({
-    meta: [
-      { title: `Services | ${brand.name}` },
-      { name: "description", content: "Interior design, 3D visualization, fit-out, renovation, custom furniture, ceiling, partition and full contracting services by DELIFE Interior Pvt Ltd." },
-      { property: "og:title", content: `Services | ${brand.name}` },
-      { property: "og:description", content: "Complete interior designing and contracting services across Sri Lanka." },
+    ...seoMeta({
+      title: "Interior Designing & Contracting Services Sri Lanka | DELIFE",
+      description:
+        "Explore services by DELIFE Interior Designing and Contracting including interior designing, 3D visualization, house planning, BOQ estimation, fit-out works, ceiling, partitions, flooring, renovation and custom furniture.",
+      canonical: "/services",
+    }),
+    scripts: [
+      jsonLd(serviceSchema()),
+      jsonLd(breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Services", path: "/services" }])),
     ],
-    links: [{ rel: "canonical", href: "/services" }],
   }),
   component: ServicesPage,
 });
@@ -55,7 +59,7 @@ function ServicesPage() {
           <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.25em] text-[color:var(--gold)]">
             <span className="h-px w-8 bg-[color:var(--gold)]" />Our Services<span className="h-px w-8 bg-[color:var(--gold)]" />
           </div>
-          <h1 className="mt-4 font-display text-4xl text-foreground sm:text-5xl md:text-6xl">Complete interior & contracting services</h1>
+          <h1 className="mt-4 font-display text-4xl text-foreground sm:text-5xl md:text-6xl">Interior Designing & Contracting Services</h1>
           <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground sm:text-lg">From the first concept sketch to final handover, every service is delivered by skilled in-house teams with attention to detail.</p>
         </div>
       </section>
@@ -67,7 +71,7 @@ function ServicesPage() {
               <div className="relative aspect-[16/10] overflow-hidden bg-[color:var(--section)]">
                 <img
                   src={serviceImages[s.slug]}
-                  alt={`${s.title} by DELIFE Interior`}
+                  alt={`${brand.name} ${s.title} Sri Lanka`}
                   className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
                   loading={i < 3 ? "eager" : "lazy"}
                 />

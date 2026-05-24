@@ -14,7 +14,15 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Preloader } from "@/components/Preloader";
 import { FloatingActions } from "@/components/FloatingActions";
-import { brand, contact } from "@/lib/site";
+import { brand } from "@/lib/site";
+import {
+  defaultMetaDescription,
+  defaultMetaTitle,
+  jsonLd,
+  localBusinessSchema,
+  organizationSchema,
+  websiteSchema,
+} from "@/lib/seo";
 
 function NotFoundComponent() {
   return (
@@ -50,44 +58,27 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: `${brand.name} | Interior Designing & Contracting in Sri Lanka` },
-      { name: "description", content: `${brand.name} — elegant interior designing, 3D planning, fit-out and contracting solutions for residential, commercial and corporate spaces in Sri Lanka.` },
+      { title: defaultMetaTitle },
+      { name: "description", content: defaultMetaDescription },
       { name: "theme-color", content: "#0D47A1" },
       { property: "og:site_name", content: brand.name },
       { property: "og:type", content: "website" },
-      { property: "og:title", content: `${brand.name} | Interior Designing & Contracting` },
-      { property: "og:description", content: brand.altPositioning },
+      { property: "og:title", content: defaultMetaTitle },
+      { property: "og:description", content: defaultMetaDescription },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", type: "image/png", href: "/favicon.png" },
+      { rel: "icon", type: "image/png", href: "/favicon.png", title: brand.name },
       { rel: "apple-touch-icon", href: "/favicon.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" },
     ],
     scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "LocalBusiness",
-          name: brand.name,
-          image: "/favicon.png",
-          telephone: contact.phone,
-          email: contact.email,
-          address: {
-            "@type": "PostalAddress",
-            addressLocality: "Battaramulla",
-            addressRegion: "Western Province",
-            addressCountry: "LK",
-          },
-          url: "/",
-          sameAs: [contact.facebook],
-          description: brand.altPositioning,
-        }),
-      },
+      jsonLd(organizationSchema()),
+      jsonLd(localBusinessSchema()),
+      jsonLd(websiteSchema()),
     ],
   }),
   shellComponent: RootShell,
@@ -112,7 +103,9 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function ScrollToTopOnNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  useEffect(() => { window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior }); }, [pathname]);
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+  }, [pathname]);
   return null;
 }
 

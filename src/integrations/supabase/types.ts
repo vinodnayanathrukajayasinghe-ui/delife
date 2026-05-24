@@ -21,6 +21,7 @@ export type Database = {
           created_at: string
           display_order: number
           id: string
+          alt_text: string | null
           published: boolean
           url: string
         }
@@ -30,6 +31,7 @@ export type Database = {
           created_at?: string
           display_order?: number
           id?: string
+          alt_text?: string | null
           published?: boolean
           url: string
         }
@@ -39,6 +41,7 @@ export type Database = {
           created_at?: string
           display_order?: number
           id?: string
+          alt_text?: string | null
           published?: boolean
           url?: string
         }
@@ -114,9 +117,13 @@ export type Database = {
           display_order: number
           excerpt: string | null
           id: string
+          canonical_url: string | null
           meta_description: string | null
+          meta_keywords: string | null
           meta_title: string | null
+          og_description: string | null
           og_image_url: string | null
+          og_title: string | null
           published: boolean
           slug: string
           title: string
@@ -128,9 +135,13 @@ export type Database = {
           display_order?: number
           excerpt?: string | null
           id?: string
+          canonical_url?: string | null
           meta_description?: string | null
+          meta_keywords?: string | null
           meta_title?: string | null
+          og_description?: string | null
           og_image_url?: string | null
+          og_title?: string | null
           published?: boolean
           slug: string
           title: string
@@ -142,9 +153,13 @@ export type Database = {
           display_order?: number
           excerpt?: string | null
           id?: string
+          canonical_url?: string | null
           meta_description?: string | null
+          meta_keywords?: string | null
           meta_title?: string | null
+          og_description?: string | null
           og_image_url?: string | null
+          og_title?: string | null
           published?: boolean
           slug?: string
           title?: string
@@ -158,6 +173,7 @@ export type Database = {
           created_at: string
           display_order: number
           id: string
+          alt_text: string | null
           kind: Database["public"]["Enums"]["project_image_kind"]
           pair_id: string | null
           project_id: string
@@ -168,6 +184,7 @@ export type Database = {
           created_at?: string
           display_order?: number
           id?: string
+          alt_text?: string | null
           kind?: Database["public"]["Enums"]["project_image_kind"]
           pair_id?: string | null
           project_id: string
@@ -178,6 +195,7 @@ export type Database = {
           created_at?: string
           display_order?: number
           id?: string
+          alt_text?: string | null
           kind?: Database["public"]["Enums"]["project_image_kind"]
           pair_id?: string | null
           project_id?: string
@@ -205,7 +223,9 @@ export type Database = {
           featured: boolean
           id: string
           location: string | null
+          meta_description: string | null
           published: boolean
+          seo_title: string | null
           slug: string
           status: Database["public"]["Enums"]["project_status"]
           summary: string | null
@@ -224,7 +244,9 @@ export type Database = {
           featured?: boolean
           id?: string
           location?: string | null
+          meta_description?: string | null
           published?: boolean
+          seo_title?: string | null
           slug: string
           status?: Database["public"]["Enums"]["project_status"]
           summary?: string | null
@@ -243,7 +265,9 @@ export type Database = {
           featured?: boolean
           id?: string
           location?: string | null
+          meta_description?: string | null
           published?: boolean
+          seo_title?: string | null
           slug?: string
           status?: Database["public"]["Enums"]["project_status"]
           summary?: string | null

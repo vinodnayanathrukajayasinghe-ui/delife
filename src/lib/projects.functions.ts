@@ -72,6 +72,8 @@ const projectInput = z.object({
   client: z.string().max(200).optional().nullable(),
   summary: z.string().max(500).optional().nullable(),
   description: z.string().max(10000).optional().nullable(),
+  seo_title: z.string().max(200).optional().nullable(),
+  meta_description: z.string().max(400).optional().nullable(),
   cover_image_url: z.string().url().max(2000).optional().nullable(),
   status: z.enum(["completed", "ongoing", "upcoming"]).default("completed"),
   completion_date: z.string().optional().nullable(),

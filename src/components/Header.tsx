@@ -53,7 +53,7 @@ export function Header() {
       >
         <div className="container-px mx-auto flex max-w-7xl items-center justify-between gap-6 py-2">
           <Link to="/" className="flex items-center gap-3" aria-label={brand.name}>
-            <img src={brand.logoFull} alt={brand.name} className="h-16 w-auto object-contain md:h-14" />
+            <img src={brand.logoFull} alt={`${brand.name} logo`} className="h-16 w-auto object-contain md:h-14" />
             <span className="sr-only">{brand.name}</span>
           </Link>
 

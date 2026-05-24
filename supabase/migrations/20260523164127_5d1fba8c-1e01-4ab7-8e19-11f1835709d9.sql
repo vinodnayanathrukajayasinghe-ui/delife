@@ -48,7 +48,7 @@ INSERT INTO public.site_settings (phone, whatsapp, email, address, hero_headline
 VALUES ('+94 77 000 0000', '+94770000000', 'info@delifeinterior.com', 'Colombo, Sri Lanka',
         'Crafting Premium Interiors Across Sri Lanka',
         'Bespoke design and turnkey contracting for residences, offices and hospitality.',
-        'admin@delifeinterior.com');
+        'info@delifeinterior.com');
 
 -- Services
 CREATE TABLE public.services (

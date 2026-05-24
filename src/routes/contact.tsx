@@ -3,16 +3,20 @@ import { useState } from "react";
 import { Mail, MapPin, Phone, MessageCircle, Facebook, Send } from "lucide-react";
 import { brand, contact, waLink } from "@/lib/site";
 import { CmsPageSection } from "@/components/CmsPageSection";
+import { breadcrumbSchema, jsonLd, localBusinessSchema, seoMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
-    meta: [
-      { title: `Contact | ${brand.name}` },
-      { name: "description", content: "Contact DELIFE Interior Pvt Ltd for interior design, fit-out and contracting projects in Sri Lanka. Call, WhatsApp or email us for a free consultation." },
-      { property: "og:title", content: `Contact | ${brand.name}` },
-      { property: "og:description", content: "Get in touch with the DELIFE team." },
+    ...seoMeta({
+      title: "Contact DELIFE Interior Designing and Contracting | Sri Lanka",
+      description:
+        "Contact DELIFE Interior Designing and Contracting for interior designing, 3D planning, fit-out, renovation and contracting services in Sri Lanka.",
+      canonical: "/contact",
+    }),
+    scripts: [
+      jsonLd(localBusinessSchema()),
+      jsonLd(breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Contact", path: "/contact" }])),
     ],
-    links: [{ rel: "canonical", href: "/contact" }],
   }),
   component: ContactPage,
 });
@@ -57,7 +61,7 @@ function ContactPage() {
           <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.25em] text-[color:var(--gold)]">
             <span className="h-px w-8 bg-[color:var(--gold)]" />Contact<span className="h-px w-8 bg-[color:var(--gold)]" />
           </div>
-          <h1 className="mt-4 font-display text-4xl text-foreground sm:text-5xl md:text-6xl">Let's design something elegant</h1>
+          <h1 className="mt-4 font-display text-4xl text-foreground sm:text-5xl md:text-6xl">Contact DELIFE Interior Designing and Contracting</h1>
           <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground sm:text-lg">Reach out for a free consultation. We typically respond within one business day.</p>
         </div>
       </section>
@@ -91,6 +95,7 @@ function ContactPage() {
             <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
               <h3 className="font-display text-xl">Get in touch</h3>
               <ul className="mt-4 space-y-4 text-sm">
+                <li className="flex items-start gap-3"><div><div className="text-xs uppercase tracking-wider text-muted-foreground">Business Name</div><div>{brand.name}</div></div></li>
                 <li className="flex items-start gap-3"><MapPin className="mt-0.5 h-4 w-4 text-primary" /><div><div className="text-xs uppercase tracking-wider text-muted-foreground">Location</div><div>{contact.address}</div></div></li>
                 <li className="flex items-start gap-3"><Phone className="mt-0.5 h-4 w-4 text-primary" /><div><div className="text-xs uppercase tracking-wider text-muted-foreground">Phone / WhatsApp</div><a href={`tel:${contact.phoneRaw}`} className="hover:text-primary">{contact.phone}</a><div className="text-xs text-muted-foreground">Alt: {contact.secondary}</div></div></li>
                 <li className="flex items-start gap-3"><Mail className="mt-0.5 h-4 w-4 text-primary" /><div><div className="text-xs uppercase tracking-wider text-muted-foreground">Email</div><a href={`mailto:${contact.email}`} className="hover:text-primary">{contact.email}</a></div></li>

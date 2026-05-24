@@ -5,6 +5,7 @@ import { listPublicProjects } from "@/lib/projects.functions";
 import { projectCover, projectTitle } from "@/lib/project-view";
 import { brand, contact, services, waLink } from "@/lib/site";
 import { CmsPageSection } from "@/components/CmsPageSection";
+import { breadcrumbSchema, jsonLd, seoMeta } from "@/lib/seo";
 
 const selectedProjectsQuery = queryOptions({
   queryKey: ["public-projects", "company-profile"],
@@ -53,13 +54,14 @@ const profileFocus = [
 export const Route = createFileRoute("/company-profile")({
   loader: ({ context }) => context.queryClient.fetchQuery(selectedProjectsQuery),
   head: () => ({
-    meta: [
-      { title: `Company Profile | ${brand.name}` },
-      { name: "description", content: "DELIFE Interior Pvt Ltd company profile - overview, vision, mission, services, core strengths, selected projects and quality commitments." },
-      { property: "og:title", content: `Company Profile | ${brand.name}` },
-      { property: "og:description", content: "Modern web-based company profile for DELIFE Interior Pvt Ltd." },
-    ],
-    links: [{ rel: "canonical", href: "/company-profile" }],
+    ...seoMeta({
+      title: "Company Profile | DELIFE Interior Designing and Contracting",
+      description:
+        "View the company profile of DELIFE Interior Designing and Contracting, including services, vision, mission, project experience and interior design capabilities in Sri Lanka.",
+      canonical: "/company-profile",
+      image: profileImages.hero,
+    }),
+    scripts: [jsonLd(breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Company Profile", path: "/company-profile" }]))],
   }),
   component: CompanyProfile,
 });
@@ -82,10 +84,10 @@ function CompanyProfile() {
             <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.25em] text-[color:var(--gold)]">
               <span className="h-px w-8 bg-[color:var(--gold)]" />Company Profile
             </div>
-            <h1 className="mt-3 font-display text-4xl text-foreground sm:text-5xl md:text-6xl">{brand.name}</h1>
+            <h1 className="mt-3 font-display text-4xl text-foreground sm:text-5xl md:text-6xl">DELIFE Interior Designing and Contracting Company Profile</h1>
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">{brand.altPositioning}</p>
             <p className="mt-4 max-w-2xl text-sm leading-relaxed text-foreground/80 sm:text-base">
-              DELIFE Interior Pvt Ltd brings design direction, technical planning, material selection and site execution into one coordinated workflow for homes, offices, retail spaces and hospitality projects across Sri Lanka.
+              DELIFE Interior Designing and Contracting brings design direction, technical planning, material selection and site execution into one coordinated workflow for homes, offices, retail spaces and hospitality projects across Sri Lanka.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <a href={waLink("Hi DELIFE, I would like to discuss a company profile inquiry.")} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-card hover:opacity-95">
@@ -114,10 +116,10 @@ function CompanyProfile() {
           </div>
 
           <div className="grid gap-4 lg:col-span-5">
-            <img src={profileImages.hero} alt="DELIFE completed interior project" className="aspect-[16/10] w-full rounded-2xl object-cover shadow-elegant" />
+            <img src={profileImages.hero} alt="DELIFE Interior Designing and Contracting completed interior project Sri Lanka" className="aspect-[16/10] w-full rounded-2xl object-cover shadow-elegant" />
             <div className="grid grid-cols-2 gap-4">
-              <img src={profileImages.feature} alt="Residential construction project" className="aspect-[4/3] w-full rounded-xl object-cover shadow-card" />
-              <img src={profileImages.detail} alt="Interior detail and finishing work" className="aspect-[4/3] w-full rounded-xl object-cover shadow-card" />
+              <img src={profileImages.feature} alt="DELIFE Interior Designing and Contracting residential house interior design" className="aspect-[4/3] w-full rounded-xl object-cover shadow-card" />
+              <img src={profileImages.detail} alt="DELIFE Interior Designing and Contracting ceiling and partition work" className="aspect-[4/3] w-full rounded-xl object-cover shadow-card" />
             </div>
             <div className="rounded-2xl border border-border bg-card/90 p-5 shadow-card backdrop-blur">
               <div className="grid gap-3 text-sm text-muted-foreground sm:grid-cols-2">
@@ -157,7 +159,7 @@ function CompanyProfile() {
 
             <div className="grid gap-5 md:grid-cols-2">
               <div className="overflow-hidden rounded-2xl border border-border bg-[color:var(--section)] shadow-card">
-                <img src={profileImages.vision} alt="Interior material selection and design direction" className="aspect-[16/10] w-full object-cover" />
+                <img src={profileImages.vision} alt="DELIFE Interior Designing and Contracting vision for interior design Sri Lanka" className="aspect-[16/10] w-full object-cover" />
                 <div className="p-7">
                 <h2 className="font-display text-2xl">Vision</h2>
                   <p className="mt-3 leading-relaxed text-foreground/85">To be a trusted interior design and contracting partner in Sri Lanka, recognized for refined design, reliable execution and spaces that create lasting value for homes, workplaces and commercial environments.</p>
@@ -165,7 +167,7 @@ function CompanyProfile() {
                 </div>
               </div>
               <div className="overflow-hidden rounded-2xl border border-border bg-[color:var(--section)] shadow-card">
-                <img src={profileImages.mission} alt="Architectural planning and project drawings" className="aspect-[16/10] w-full object-cover" />
+                <img src={profileImages.mission} alt="DELIFE Interior Designing and Contracting mission for house planning Sri Lanka" className="aspect-[16/10] w-full object-cover" />
                 <div className="p-7">
                 <h2 className="font-display text-2xl">Mission</h2>
                   <p className="mt-3 leading-relaxed text-foreground/85">To deliver complete interior, fit-out and contracting solutions through thoughtful design, accurate planning, quality materials, skilled workmanship and disciplined project management.</p>
@@ -246,7 +248,7 @@ function CompanyProfile() {
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 {projects.map((p) => (
                   <Link key={p.id} to="/projects/$slug" params={{ slug: p.slug }} className="group overflow-hidden rounded-xl border border-border bg-card shadow-card transition hover:-translate-y-1 hover:shadow-elegant">
-                    <img src={projectCover(p)} alt={projectTitle(p)} className="aspect-[4/3] w-full object-cover transition group-hover:scale-105" />
+                    <img src={projectCover(p)} alt={`${brand.name} ${projectTitle(p)} project Sri Lanka`} className="aspect-[4/3] w-full object-cover transition group-hover:scale-105" />
                     <div className="p-4">
                       {p.category && <div className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--gold)]">{p.category}</div>}
                       <div className="font-display">{projectTitle(p)}</div>
@@ -258,7 +260,7 @@ function CompanyProfile() {
           </div>
 
           <aside className="space-y-4 lg:sticky lg:top-28 lg:self-start">
-            <img src={profileImages.planning} alt="DELIFE planning and fit-out work" className="aspect-[4/3] w-full rounded-2xl object-cover shadow-card" />
+            <img src={profileImages.planning} alt="DELIFE Interior Designing and Contracting planning and fit-out work" className="aspect-[4/3] w-full rounded-2xl object-cover shadow-card" />
             <div className="rounded-xl border border-border bg-card p-6 shadow-card">
               <Award className="h-5 w-5 text-[color:var(--gold)]" />
               <h3 className="mt-3 font-display text-lg">Quality-Focused</h3>
