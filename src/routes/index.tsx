@@ -68,7 +68,6 @@ export const Route = createFileRoute("/")({
       description:
         "DELIFE Interior Designing and Contracting offers professional interior designing, 3D visualization, fit-out, renovation and contracting services for homes, offices and commercial spaces in Sri Lanka.",
       canonical: "/",
-      image: homeImages.hero[0],
     }),
     scripts: [jsonLd(breadcrumbSchema([{ name: "Home", path: "/" }]))],
   }),

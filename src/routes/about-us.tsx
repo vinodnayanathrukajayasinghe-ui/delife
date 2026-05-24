@@ -29,7 +29,6 @@ export const Route = createFileRoute("/about-us")({
       description:
         "Learn about DELIFE Interior Designing and Contracting, a professional interior designing and contracting company in Sri Lanka focused on creative design, quality workmanship and reliable project execution.",
       canonical: "/about-us",
-      image: aboutImages.hero,
     }),
     scripts: [jsonLd(breadcrumbSchema([{ name: "Home", path: "/" }, { name: "About", path: "/about-us" }]))],
   }),

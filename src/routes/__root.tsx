@@ -23,6 +23,7 @@ import {
   organizationSchema,
   websiteSchema,
   DEFAULT_OG_IMAGE,
+  absoluteUrl,
 } from "@/lib/seo";
 
 function NotFoundComponent() {
@@ -66,9 +67,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { property: "og:title", content: defaultMetaTitle },
       { property: "og:description", content: defaultMetaDescription },
-      { property: "og:image", content: `http://www.delifeinterior.com${DEFAULT_OG_IMAGE}` },
+      { property: "og:image", content: absoluteUrl(DEFAULT_OG_IMAGE) },
+      { property: "og:image:secure_url", content: absoluteUrl(DEFAULT_OG_IMAGE) },
+      { property: "og:image:type", content: "image/jpeg" },
+      { property: "og:image:width", content: "1600" },
+      { property: "og:image:height", content: "1600" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: `http://www.delifeinterior.com${DEFAULT_OG_IMAGE}` },
+      { name: "twitter:image", content: absoluteUrl(DEFAULT_OG_IMAGE) },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

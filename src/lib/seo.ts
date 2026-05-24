@@ -1,6 +1,6 @@
 import { brand, contact, services } from "@/lib/site";
 
-export const SITE_URL = "http://www.delifeinterior.com";
+export const SITE_URL = "https://delifeinterior.com";
 export const DEFAULT_OG_IMAGE = "/delife-logo-new.jpg";
 export const DEFAULT_LOGO_IMAGE = "/delife-logo-new.png";
 
@@ -67,7 +67,16 @@ export function seoMeta({
       { property: "og:title", content: title },
       { property: "og:description", content: description },
       { property: "og:url", content: absoluteUrl(canonical) },
-      ...(image ? [{ property: "og:image", content: absoluteUrl(image) }, { name: "twitter:image", content: absoluteUrl(image) }] : []),
+      ...(image
+        ? [
+            { property: "og:image", content: absoluteUrl(image) },
+            { property: "og:image:secure_url", content: absoluteUrl(image) },
+            { property: "og:image:type", content: "image/jpeg" },
+            { property: "og:image:width", content: "1600" },
+            { property: "og:image:height", content: "1600" },
+            { name: "twitter:image", content: absoluteUrl(image) },
+          ]
+        : []),
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: absoluteUrl(canonical) }],

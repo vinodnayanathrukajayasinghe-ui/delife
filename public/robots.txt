@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin
 Disallow: /admin-login
 
-Sitemap: http://www.delifeinterior.com/sitemap.xml
+Sitemap: https://delifeinterior.com/sitemap.xml
