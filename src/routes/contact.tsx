@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Mail, MapPin, Phone, MessageCircle, Facebook, Send } from "lucide-react";
 import { brand, contact, waLink } from "@/lib/site";
+import { CmsPageSection } from "@/components/CmsPageSection";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -113,6 +114,8 @@ function ContactPage() {
           </aside>
         </div>
       </section>
+
+      <CmsPageSection slug="contact" />
     </>
   );
 }

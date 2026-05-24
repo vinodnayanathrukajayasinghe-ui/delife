@@ -8,6 +8,82 @@ const slugify = (s: string) =>
 
 const slugRegex = /^[a-z0-9-]+$/;
 
+export const websitePagePaths: Record<string, string> = {
+  home: "/",
+  "about-us": "/about-us",
+  services: "/services",
+  projects: "/projects",
+  gallery: "/gallery",
+  "company-profile": "/company-profile",
+  contact: "/contact",
+};
+
+const websitePages = [
+  {
+    title: "Home",
+    slug: "home",
+    excerpt: "Editable content for the home page.",
+    content_html:
+      "<h2>Welcome to DELIFE Interior</h2><p>Update this block from the admin panel to add homepage announcements, featured offers, company highlights or important service information.</p>",
+    published: true,
+    display_order: 1,
+  },
+  {
+    title: "About Us",
+    slug: "about-us",
+    excerpt: "Editable content for the About Us page.",
+    content_html:
+      "<h2>About DELIFE Interior</h2><p>Use this section to update company background, team details, certifications, vision, mission and values without changing code.</p>",
+    published: true,
+    display_order: 2,
+  },
+  {
+    title: "Services",
+    slug: "services",
+    excerpt: "Editable content for the services page.",
+    content_html:
+      "<h2>Service Notes</h2><p>Add service introductions, special packages, warranty information, process details or frequently requested service details here.</p>",
+    published: true,
+    display_order: 3,
+  },
+  {
+    title: "Projects",
+    slug: "projects",
+    excerpt: "Editable content for the projects page.",
+    content_html:
+      "<h2>Project Portfolio</h2><p>Add portfolio notes, featured project summaries or client-sector descriptions here. Individual projects are managed from the Projects tab.</p>",
+    published: true,
+    display_order: 4,
+  },
+  {
+    title: "Gallery",
+    slug: "gallery",
+    excerpt: "Editable content for the gallery page.",
+    content_html:
+      "<h2>Gallery Information</h2><p>Add image collection notes, project photography descriptions or category explanations here. Gallery images are managed from the Gallery tab.</p>",
+    published: true,
+    display_order: 5,
+  },
+  {
+    title: "Company Profile",
+    slug: "company-profile",
+    excerpt: "Editable content for the company profile page.",
+    content_html:
+      "<h2>Company Profile Updates</h2><p>Add updated company achievements, capabilities, sectors, credentials and profile notes here.</p>",
+    published: true,
+    display_order: 6,
+  },
+  {
+    title: "Contact",
+    slug: "contact",
+    excerpt: "Editable content for the contact page.",
+    content_html:
+      "<h2>Contact Page Notes</h2><p>Add consultation instructions, showroom visit notes, response times or project inquiry guidance here. Contact details are managed from Site Settings.</p>",
+    published: true,
+    display_order: 7,
+  },
+];
+
 // PUBLIC
 export const listPublicPages = createServerFn({ method: "GET" }).handler(async () => {
   const { data, error } = await supabaseAdmin
@@ -44,6 +120,17 @@ export const adminListPages = createServerFn({ method: "GET" })
       .select("*")
       .order("display_order")
       .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
+
+export const adminEnsureWebsitePages = createServerFn({ method: "POST" })
+  .middleware([requireAdmin])
+  .handler(async () => {
+    const { data, error } = await supabaseAdmin
+      .from("pages")
+      .upsert(websitePages, { onConflict: "slug", ignoreDuplicates: false })
+      .select("id,slug");
     if (error) throw new Error(error.message);
     return data ?? [];
   });
@@ -91,7 +178,7 @@ export const adminSavePage = createServerFn({ method: "POST" })
     }
     const { data: row, error } = await supabaseAdmin
       .from("pages")
-      .insert(payload)
+      .upsert(payload, { onConflict: "slug", ignoreDuplicates: false })
       .select("id")
       .single();
     if (error) throw new Error(error.message);

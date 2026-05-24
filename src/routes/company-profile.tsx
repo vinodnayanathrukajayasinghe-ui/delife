@@ -4,6 +4,7 @@ import { Shield, Award, CheckCircle2, ArrowRight, Building2, Sparkles, Mail, Map
 import { listPublicProjects } from "@/lib/projects.functions";
 import { projectCover, projectTitle } from "@/lib/project-view";
 import { brand, contact, services, waLink } from "@/lib/site";
+import { CmsPageSection } from "@/components/CmsPageSection";
 
 const selectedProjectsQuery = queryOptions({
   queryKey: ["public-projects", "company-profile"],
@@ -276,6 +277,8 @@ function CompanyProfile() {
           </aside>
         </div>
       </section>
+
+      <CmsPageSection slug="company-profile" />
     </>
   );
 }

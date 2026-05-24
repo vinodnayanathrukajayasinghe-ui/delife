@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Award, CheckCircle2, Eye, Target } from "lucide-react";
 import { brand, whyChooseUs } from "@/lib/site";
 import { SectionHeading } from "@/components/SectionHeading";
+import { CmsPageSection } from "@/components/CmsPageSection";
 
 const aboutImages = {
   hero:
@@ -154,6 +155,8 @@ function About() {
           </div>
         </div>
       </section>
+
+      <CmsPageSection slug="about-us" />
     </>
   );
 }

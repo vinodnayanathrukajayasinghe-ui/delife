@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { MessageCircle } from "lucide-react";
 import { brand, services, waLink } from "@/lib/site";
+import { CmsPageSection } from "@/components/CmsPageSection";
 
 const serviceImages: Record<string, string> = {
   "interior-designing":
@@ -96,6 +97,8 @@ function ServicesPage() {
           </div>
         </div>
       </section>
+
+      <CmsPageSection slug="services" />
     </>
   );
 }

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Save, ArrowLeft, ExternalLink } from "lucide-react";
-import { adminGetPage, adminSavePage } from "@/lib/pages.functions";
+import { adminGetPage, adminSavePage, websitePagePaths } from "@/lib/pages.functions";
 import { RichTextEditor } from "@/components/RichTextEditor";
 
 export const Route = createFileRoute("/admin/pages/$id")({ component: AdminPageEdit });
@@ -39,6 +39,7 @@ function AdminPageEdit() {
   }
 
   const set = (k: string, v: any) => setForm({ ...form, [k]: v });
+  const viewHref = form.slug ? (websitePagePaths[form.slug] ?? `/p/${form.slug}`) : "";
 
   return (
     <div>
@@ -50,9 +51,9 @@ function AdminPageEdit() {
           <h1 className="font-display text-2xl">Edit page</h1>
         </div>
         <div className="flex items-center gap-2">
-          {form.published && form.slug && (
+          {form.published && viewHref && (
             <a
-              href={`/p/${form.slug}`}
+              href={viewHref}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold hover:border-primary hover:text-primary"

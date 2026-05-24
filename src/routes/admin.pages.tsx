@@ -2,7 +2,7 @@ import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tan
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Plus, ExternalLink, Trash2, Pencil } from "lucide-react";
-import { adminListPages, adminDeletePage, adminSavePage } from "@/lib/pages.functions";
+import { adminListPages, adminDeletePage, adminEnsureWebsitePages, adminSavePage, websitePagePaths } from "@/lib/pages.functions";
 
 export const Route = createFileRoute("/admin/pages")({ component: AdminPagesIndex });
 
@@ -12,6 +12,7 @@ function AdminPagesIndex() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const list = useServerFn(adminListPages);
   const save = useServerFn(adminSavePage);
+  const ensureWebsitePages = useServerFn(adminEnsureWebsitePages);
   const del = useServerFn(adminDeletePage);
 
   const q = useQuery({ queryKey: ["admin", "pages"], queryFn: () => list() });
@@ -23,40 +24,7 @@ function AdminPagesIndex() {
   });
 
   const createStarterPages = useMutation({
-    mutationFn: async () => {
-      const starterPages = [
-        {
-          title: "About DELIFE Interior",
-          slug: "about-delife-interior",
-          excerpt: "Company overview, values, vision and mission for DELIFE Interior Pvt Ltd.",
-          content_html:
-            "<h2>Complete interior and contracting partner</h2><p>DELIFE Interior Pvt Ltd delivers interior designing, 3D planning, fit-out works, renovations, construction support, commercial interiors, office interiors, customized furniture and project execution across Sri Lanka.</p><h2>Vision</h2><p>To be a trusted interior design and contracting partner recognized for refined design, reliable execution and spaces that create lasting value.</p><h2>Mission</h2><p>To deliver complete interior and contracting solutions through thoughtful design, accurate planning, quality materials, skilled workmanship and disciplined project management.</p>",
-          published: true,
-          display_order: 1,
-        },
-        {
-          title: "Interior Design Services",
-          slug: "interior-design-services",
-          excerpt: "Interior designing, 3D visualization, BOQ, fit-out and renovation services.",
-          content_html:
-            "<h2>Our services</h2><p>We provide interior designing, 3D design and visualization, house planning, concept drawings, BOQ and estimation, interior fit-out works, office interiors, commercial interiors, customized furniture, renovation and contracting, ceiling and partition works, flooring and hospitality interiors.</p>",
-          published: true,
-          display_order: 2,
-        },
-        {
-          title: "Quality and Project Delivery",
-          slug: "quality-project-delivery",
-          excerpt: "How DELIFE manages design, planning, execution, quality control and handover.",
-          content_html:
-            "<h2>Professional delivery process</h2><p>Every project is planned through consultation, space planning, 3D concepts, estimation, execution and final handover. Our team focuses on practical design, clear documentation, quality workmanship and dependable timelines.</p>",
-          published: true,
-          display_order: 3,
-        },
-      ];
-      for (const page of starterPages) {
-        await save({ data: page });
-      }
-    },
+    mutationFn: () => ensureWebsitePages(),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "pages"] }),
   });
 
@@ -77,28 +45,37 @@ function AdminPagesIndex() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display text-2xl">Pages</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Create and manage CMS pages with rich content and SEO.</p>
+          <p className="mt-1 text-sm text-muted-foreground">Create and manage website pages with rich content and SEO.</p>
         </div>
-        <button
-          onClick={() => create.mutate()}
-          disabled={create.isPending}
-          className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-card hover:opacity-95 disabled:opacity-60"
-        >
-          <Plus className="h-4 w-4" /> New page
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => createStarterPages.mutate()}
+            disabled={createStarterPages.isPending}
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-semibold hover:border-primary hover:text-primary disabled:opacity-60"
+          >
+            <Plus className="h-4 w-4" /> {createStarterPages.isPending ? "Syncing..." : "Show all website pages"}
+          </button>
+          <button
+            onClick={() => create.mutate()}
+            disabled={create.isPending}
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-card hover:opacity-95 disabled:opacity-60"
+          >
+            <Plus className="h-4 w-4" /> New custom page
+          </button>
+        </div>
       </div>
 
       <div className="mt-6 overflow-hidden rounded-xl border border-border bg-card shadow-card">
         {q.isLoading && <p className="p-5 text-sm text-muted-foreground">Loading…</p>}
         {q.data?.length === 0 && (
           <div className="flex flex-wrap items-center justify-between gap-3 p-5">
-            <p className="text-sm text-muted-foreground">No pages yet. Create a blank page or add starter CMS pages for the website.</p>
+            <p className="text-sm text-muted-foreground">No pages yet. Sync the main website pages or create a blank custom page.</p>
             <button
               onClick={() => createStarterPages.mutate()}
               disabled={createStarterPages.isPending}
               className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-xs font-semibold hover:border-primary hover:text-primary disabled:opacity-60"
             >
-              <Plus className="h-3.5 w-3.5" /> {createStarterPages.isPending ? "Creating..." : "Add starter pages"}
+              <Plus className="h-3.5 w-3.5" /> {createStarterPages.isPending ? "Syncing..." : "Show all website pages"}
             </button>
           </div>
         )}
@@ -116,12 +93,12 @@ function AdminPagesIndex() {
                     {p.published ? "Live" : "Draft"}
                   </span>
                 </div>
-                <div className="mt-1 text-xs text-muted-foreground">/p/{p.slug}</div>
+                <div className="mt-1 text-xs text-muted-foreground">{websitePagePaths[p.slug] ?? `/p/${p.slug}`}</div>
               </div>
               <div className="flex items-center gap-2">
                 {p.published && (
                   <a
-                    href={`/p/${p.slug}`}
+                    href={websitePagePaths[p.slug] ?? `/p/${p.slug}`}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-3 py-1.5 text-xs font-semibold hover:border-primary hover:text-primary"

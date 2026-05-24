@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { listPublicProjects } from "@/lib/projects.functions";
 import { brand } from "@/lib/site";
+import { CmsPageSection } from "@/components/CmsPageSection";
 import {
   projectCategories,
   projectCompletion,
@@ -94,6 +95,8 @@ function ProjectsPage() {
 
         {filtered.length === 0 && <p className="mt-10 text-center text-sm text-muted-foreground">No projects in this category yet.</p>}
       </section>
+
+      <CmsPageSection slug="projects" />
     </>
   );
 }

@@ -5,6 +5,7 @@ import { listPublicProjects } from "@/lib/projects.functions";
 import { projectCover, projectTitle } from "@/lib/project-view";
 import { brand, contact, processSteps, services, testimonials, waLink, whyChooseUs } from "@/lib/site";
 import { SectionHeading } from "@/components/SectionHeading";
+import { CmsPageSection } from "@/components/CmsPageSection";
 
 const featuredProjectsQuery = queryOptions({
   queryKey: ["public-projects", "featured"],
@@ -259,6 +260,8 @@ function Home() {
           </div>
         </div>
       </section>
+
+      <CmsPageSection slug="home" />
 
       {/* CTA BANNER */}
       <section className="container-px mx-auto max-w-7xl py-20">

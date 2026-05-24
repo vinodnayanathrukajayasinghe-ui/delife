@@ -3,6 +3,7 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { brand, galleryCategories, galleryItems } from "@/lib/site";
+import { CmsPageSection } from "@/components/CmsPageSection";
 
 const galleryQuery = queryOptions({
   queryKey: ["gallery-images"],
@@ -73,6 +74,7 @@ function GalleryPage() {
           })}
         </div>
       </section>
+      <CmsPageSection slug="gallery" />
     </main>
   );
 }
