@@ -1,9 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { Shield, Award, CheckCircle2, ArrowRight, Building2, Sparkles } from "lucide-react";
+import { Shield, Award, CheckCircle2, ArrowRight, Building2, Sparkles, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { listPublicProjects } from "@/lib/projects.functions";
 import { projectCover, projectTitle } from "@/lib/project-view";
-import { brand, services } from "@/lib/site";
+import { brand, contact, services, waLink } from "@/lib/site";
 
 const selectedProjectsQuery = queryOptions({
   queryKey: ["public-projects", "company-profile"],
@@ -42,6 +42,13 @@ const deliveryStandards = [
   { title: "Site Discipline", text: "Work is coordinated through practical schedules, site checks and quality-focused handover." },
 ];
 
+const profileFocus = [
+  "Residential interiors, house planning and renovation",
+  "Commercial, office and retail fit-out delivery",
+  "Hospitality spaces including restaurants, salons and showrooms",
+  "Custom furniture, joinery, ceiling, partition and flooring works",
+];
+
 export const Route = createFileRoute("/company-profile")({
   loader: ({ context }) => context.queryClient.fetchQuery(selectedProjectsQuery),
   head: () => ({
@@ -67,7 +74,8 @@ function CompanyProfile() {
   return (
     <>
       <section className="relative isolate overflow-hidden border-b border-border bg-[color:var(--section)]">
-        <div className="absolute inset-0 -z-10 bg-grid-soft opacity-30" />
+        <div className="absolute inset-0 -z-10 bg-grid-soft opacity-45" />
+        <div className="absolute inset-x-0 top-0 -z-10 h-44 bg-gradient-to-b from-primary/10 to-transparent" />
         <div className="container-px mx-auto grid max-w-7xl gap-12 py-20 lg:grid-cols-12 lg:items-center">
           <div className="lg:col-span-7">
             <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.25em] text-[color:var(--gold)]">
@@ -75,11 +83,30 @@ function CompanyProfile() {
             </div>
             <h1 className="mt-3 font-display text-4xl text-foreground sm:text-5xl md:text-6xl">{brand.name}</h1>
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">{brand.altPositioning}</p>
+            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-foreground/80 sm:text-base">
+              DELIFE Interior Pvt Ltd brings design direction, technical planning, material selection and site execution into one coordinated workflow for homes, offices, retail spaces and hospitality projects across Sri Lanka.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <a href={waLink("Hi DELIFE, I would like to discuss a company profile inquiry.")} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-card hover:opacity-95">
+                <MessageCircle className="h-4 w-4" /> WhatsApp Inquiry
+              </a>
+              <Link to="/contact" className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-semibold text-foreground shadow-card hover:border-primary hover:text-primary">
+                Contact Details <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
             <div className="mt-8 grid max-w-2xl gap-4 sm:grid-cols-3">
               {metrics.map(([value, label]) => (
                 <div key={label} className="rounded-xl border border-border bg-card/80 p-4 shadow-card backdrop-blur">
                   <div className="font-display text-3xl text-primary">{value}</div>
                   <div className="mt-1 text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 grid max-w-2xl gap-3 sm:grid-cols-2">
+              {profileFocus.map((item) => (
+                <div key={item} className="flex items-start gap-2 rounded-xl border border-border bg-card/70 p-3 text-sm text-foreground/85 shadow-card backdrop-blur">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[color:var(--gold)]" />
+                  <span>{item}</span>
                 </div>
               ))}
             </div>
@@ -90,6 +117,13 @@ function CompanyProfile() {
             <div className="grid grid-cols-2 gap-4">
               <img src={profileImages.feature} alt="Residential construction project" className="aspect-[4/3] w-full rounded-xl object-cover shadow-card" />
               <img src={profileImages.detail} alt="Interior detail and finishing work" className="aspect-[4/3] w-full rounded-xl object-cover shadow-card" />
+            </div>
+            <div className="rounded-2xl border border-border bg-card/90 p-5 shadow-card backdrop-blur">
+              <div className="grid gap-3 text-sm text-muted-foreground sm:grid-cols-2">
+                <a href={`tel:${contact.phoneRaw}`} className="flex items-center gap-2 hover:text-primary"><Phone className="h-4 w-4 text-primary" /> {contact.phone}</a>
+                <a href={`mailto:${contact.email}`} className="flex items-center gap-2 hover:text-primary"><Mail className="h-4 w-4 text-primary" /> {contact.email}</a>
+                <div className="flex items-center gap-2 sm:col-span-2"><MapPin className="h-4 w-4 text-primary" /> {contact.address}</div>
+              </div>
             </div>
           </div>
         </div>
@@ -105,6 +139,19 @@ function CompanyProfile() {
               <h2 className="font-display text-2xl">Overview</h2>
               <p className="mt-3 leading-relaxed text-foreground/85">{brand.name} is a Sri Lanka-based interior designing and contracting company specializing in interior design, 3D visualization, fit-out works, renovations, construction support, commercial interiors, office interiors, customized furniture and project execution.</p>
               <p className="mt-3 leading-relaxed text-foreground/85">We work with residential, commercial and corporate clients to deliver elegant, functional and durable spaces through structured planning, quality workmanship and dependable project coordination.</p>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-3">
+              {[
+                ["Registered Name", brand.name],
+                ["Business Focus", "Interior design, fit-out and contracting"],
+                ["Service Area", "Sri Lanka"],
+              ].map(([label, value]) => (
+                <div key={label} className="rounded-xl border border-border bg-[color:var(--section)] p-5">
+                  <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--gold)]">{label}</div>
+                  <div className="mt-2 text-sm font-semibold leading-relaxed text-foreground">{value}</div>
+                </div>
+              ))}
             </div>
 
             <div className="grid gap-5 md:grid-cols-2">
