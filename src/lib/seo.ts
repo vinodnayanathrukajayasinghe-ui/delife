@@ -1,6 +1,8 @@
 import { brand, contact, services } from "@/lib/site";
 
 export const SITE_URL = "http://www.delifeinterior.com";
+export const DEFAULT_OG_IMAGE = "/delife-logo-new.jpg";
+export const DEFAULT_LOGO_IMAGE = "/delife-logo-new.png";
 
 export const defaultMetaTitle =
   "DELIFE Interior Designing and Contracting | Interior Design & Contracting Sri Lanka";
@@ -44,7 +46,7 @@ export function seoMeta({
   title = defaultMetaTitle,
   description = defaultMetaDescription,
   canonical = "/",
-  image,
+  image = DEFAULT_OG_IMAGE,
   keywords = primaryKeywords,
   type = "website",
 }: {
@@ -86,7 +88,7 @@ export function organizationSchema() {
     name: brand.name,
     alternateName: brand.short,
     url: SITE_URL,
-    logo: absoluteUrl("/favicon.png"),
+    logo: absoluteUrl(DEFAULT_LOGO_IMAGE),
     email: contact.email,
     telephone: contact.phoneRaw,
     sameAs: [contact.facebook],
@@ -100,7 +102,7 @@ export function localBusinessSchema() {
     name: brand.name,
     alternateName: brand.short,
     description: defaultMetaDescription,
-    image: absoluteUrl("/favicon.png"),
+    image: absoluteUrl(DEFAULT_OG_IMAGE),
     url: SITE_URL,
     telephone: contact.phoneRaw,
     email: contact.email,
