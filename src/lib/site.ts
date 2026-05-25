@@ -13,10 +13,10 @@ export const brand = {
 };
 
 export const contact = {
-  email: "delifeinterior@gmail.com",
-  phone: "+94 76 792 8085",
-  phoneRaw: "+94767928085",
-  whatsapp: "94767928085",
+  email: "delifeinteriorltd@gmail.com",
+  phone: "+94 76 961 4447",
+  phoneRaw: "+94769614447",
+  whatsapp: "94769614447",
   secondary: "+94 76 965 2653",
   address: "Battaramulla, Western Province, Sri Lanka",
   facebook: "https://www.facebook.com/delifeltd",
